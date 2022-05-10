@@ -1,0 +1,56 @@
+<h1>My Drag-and-Drop Example</h1>
+
+<table mat-table [dataSource]="displayedForm" class="mat-elevation-z8">
+  <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns; let colIndex = index;">
+    <td
+      mat-cell
+      *matCellDef="let element; let rowIndex = index;"
+    >
+      <div
+        class="above-droppable"
+        (dragover)="onDragOver($event, element.id)"
+        (dragend)="onDragLeave($event)"
+        (drop)="onDrop($event, rowIndex, rowIndex - 1, true)"
+      ></div>
+      
+
+      <div>
+        <div
+          class="left-droppable"
+          (dragover)="onDragOver($event, element.id)"
+          (dragend)="onDragLeave($event)"
+          (drop)="onDrop($event, colIndex, colIndex - 1, false)"
+        ></div>
+
+        <div>
+          <div
+            [id]="element.id"
+            class="draggable-element"
+            draggable="true"
+            (dragstart)="onDragStart($event, element)"
+            >
+            {{ element[column] }}
+          </div>
+        </div>
+
+        <div
+          class="right-droppable"
+          (dragover)="onDragOver($event, element.id)"
+          (dragend)="onDragLeave($event)"
+          (drop)="onDrop($event, colIndex, colIndex + 1, false)"
+        ></div>
+
+      </div>
+
+      <div
+        class="below-droppable"
+        (dragover)="onDragOver($event, element.id)"
+        (dragend)="onDragLeave($event)"
+        (drop)="onDrop($event, rowIndex, rowIndex + 1, true)"
+      ></div>
+
+    </td>
+  </ng-container>
+
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>

@@ -1,0 +1,49 @@
+.example-draggable {
+  border-style: solid;
+  font-weight: normal;
+  padding: 10px;
+}
+
+// .above-below-droppable {
+//   padding-bottom: 20px;
+// }
+
+.above-droppable {
+  padding: 20px;
+}
+
+.below-droppable {
+  padding: 20px;
+}
+
+.left-droppable {
+  float: left;
+  width: 10%;
+}
+
+.draggable-element {
+  float: left;
+  width: 80%;
+}
+
+.right-droppable {
+  float: left;
+  width: 10%;
+}
+
+
+table {
+  width: 100%;
+}
+
+button {
+  margin: 16px 8px;
+}
+
+
+// .container {
+//   display: flex;
+// }
+// .container > div {
+//   flex: 1; /*grow*/
+// }
