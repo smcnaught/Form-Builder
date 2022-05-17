@@ -1,6 +1,6 @@
-<h1>My Drag-and-Drop Example</h1>
+<h1>Form Builder</h1>
 
-<table mat-table [dataSource]="displayedForm" class="mat-elevation-z8">
+<table mat-table [dataSource]="formData" class="mat-elevation-z8">
   <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns; let colIndex = index;">
     <td
       mat-cell
@@ -8,45 +8,42 @@
     >
       <div
         class="above-droppable"
-        (dragover)="onDragOver($event, element.id)"
+        (dragover)="onDragOver($event, rowIndex, colIndex)"
         (dragend)="onDragLeave($event)"
-        (drop)="onDrop($event, rowIndex, rowIndex - 1, true)"
+        (drop)="onDrop($event)"
       ></div>
       
 
       <div>
         <div
           class="left-droppable"
-          (dragover)="onDragOver($event, element.id)"
+          (dragover)="onDragOver($event, rowIndex, colIndex - 1 > 0 ? colIndex : 0)"
           (dragend)="onDragLeave($event)"
-          (drop)="onDrop($event, colIndex, colIndex - 1, false)"
+          (drop)="onDrop($event)"
         ></div>
 
-        <div>
-          <div
-            [id]="element.id"
-            class="draggable-element"
-            draggable="true"
-            (dragstart)="onDragStart($event, element)"
-            >
-            {{ element[column] }}
-          </div>
+        <div
+          class="draggable-element"
+          draggable="true"
+          (dragstart)="onDragStart($event, colIndex, rowIndex)"
+          >
+          {{ element[column] }}
         </div>
 
         <div
           class="right-droppable"
-          (dragover)="onDragOver($event, element.id)"
+          (dragover)="onDragOver($event, rowIndex, colIndex + 1)"
           (dragend)="onDragLeave($event)"
-          (drop)="onDrop($event, colIndex, colIndex + 1, false)"
+          (drop)="onDrop($event)"
         ></div>
 
       </div>
 
       <div
         class="below-droppable"
-        (dragover)="onDragOver($event, element.id)"
+        (dragover)="onDragOver($event, rowIndex + 1, colIndex)"
         (dragend)="onDragLeave($event)"
-        (drop)="onDrop($event, rowIndex, rowIndex + 1, true)"
+        (drop)="onDrop($event)"
       ></div>
 
     </td>
