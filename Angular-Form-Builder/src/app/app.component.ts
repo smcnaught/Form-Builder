@@ -1,6 +1,33 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTable } from '@angular/material/table';
 
+interface IRemoveItem {
+  column: number;
+  row: number;
+}
+
+interface IAddItem {
+  column: number;
+  row: number;
+}
+
+interface INewRow {
+  totalColumns: number;
+  columnWithData: number;
+  columnData: string;
+}
+
+
+interface IMoveItem {
+  newColumn: number;
+  newRow: number;
+}
+
+interface ISwitchInfo {
+  column: number;
+  row: number;
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -23,43 +50,56 @@ export class AppComponent implements OnInit {
 
   }
 
-  public onDrop(event: any): void {
+  public onDrop(): void {
     const movingWithinColumn: boolean = this.dragInfo.draggedItemColumn === this.dragInfo.moveToColumn;
     const draggingDown: boolean = this.dragInfo.draggedItemRow < this.dragInfo.moveToRow;
 
-    if (movingWithinColumn) {
-      if (draggingDown) {
-        this.dragInfo.moveToRow--;
+    if (movingWithinColumn && draggingDown) this.dragInfo.moveToRow--;
+
+    // add new row
+    if (this.dragInfo.moveToRow === this.formData.length) {
+      const dataToMove: string = this.formData[this.dragInfo.draggedItemRow]['column'+this.dragInfo.draggedItemColumn];
+      const newRowInfo: INewRow = {
+        totalColumns: this.displayedColumns.length,
+        columnWithData: this.dragInfo.moveToColumn,
+        columnData: dataToMove,
       }
-    }
-
-    console.log(this.dragInfo.draggedItemColumn); // column it's coming from: 
-    console.log(this.dragInfo.draggedItemRow); // what row it's coming from: 
-    console.log(this.dragInfo.moveToColumn); // what column it's going to:
-    console.log(this.dragInfo.moveToRow); // what row it's going to:
-
-
-
-    if (this.dragInfo.moveToRow > this.displayedColumns.length) {
-      // add new row
-    }
-
-
-
-    // LEAVING this here for reference, but can probably delete soon. It doesn't work for everything.
-    // if (droppingOnRow) {
-    //   const moveToIndex = Math.max(...[index1, index2]);
-    //   event.preventDefault();
       
-    //   // Add new item
-    //   const itemToMove = this.formData.find((item: IDragItem) => item.id === this.dragInfo.draggedItemId);
-    //   this.formData.splice(moveToIndex, 0, itemToMove as IDragItem);
-  
-    //   // remove old item
-    //   this.formData = this.formData.filter((item: IDragItem, index: number) => item.id !== this.dragInfo.draggedItemId || index === moveToIndex);
-  
-    //   this.table.renderRows();
-    // }
+      let removeInfo: IRemoveItem = {
+        column: this.dragInfo.draggedItemColumn,
+        row: this.dragInfo.draggedItemRow,
+      }
+
+      this.addRow(newRowInfo, removeInfo);
+    }
+    else if (this.dragInfo.draggedItemColumn === this.dragInfo.moveToColumn) {
+      const switchItem1: ISwitchInfo = {
+        column: this.dragInfo.moveToColumn,
+        row: this.dragInfo.moveToRow
+      }
+
+      const switchItem2: ISwitchInfo = {
+        column: this.dragInfo.draggedItemColumn,
+        row: this.dragInfo.draggedItemRow,
+      }
+
+      this.switchItemsInColumn(switchItem1, switchItem2);
+    }
+    else {
+      let removeInfo: IRemoveItem = {
+        column: this.dragInfo.draggedItemColumn,
+        row: this.dragInfo.draggedItemRow,
+      }
+
+      let addInfo: IAddItem = {
+        column: this.dragInfo.moveToColumn,
+        row: this.dragInfo.moveToRow
+      }
+
+      this.moveBetweenColumns(removeInfo, addInfo);
+    }
+
+    this.checkDeleteEmptyRows(this.displayedColumns.length);
   }
 
   public onDragStart(event: DragEvent, columnIndex: number, rowIndex: number): void {
@@ -86,6 +126,68 @@ export class AppComponent implements OnInit {
     })
 
     this.displayedColumns.push(columnName);
+    this.table.renderRows();
+  }
+
+  private switchItemsInColumn(item1Position: ISwitchInfo, item2Position: ISwitchInfo): void {
+    const newItem1 = this.formData[item2Position.row]['column'+item2Position.column];
+    const newItem2 = this.formData[item1Position.row]['column'+item1Position.column];
+
+    this.formData[item1Position.row]['column'+item1Position.column] = newItem1;
+    this.formData[item2Position.row]['column'+item2Position.column] = newItem2;
+    this.table.renderRows();
+  }
+
+  private moveBetweenColumns(removeInfo: IRemoveItem, addInfo: IAddItem): void {
+    let itemToMove;
+    let itemReplacing = this.formData[removeInfo.row]['column'+removeInfo.column];
+    this.removeData(removeInfo);
+    
+    const changingColumn: string = 'column'+addInfo.column;
+    for (let i = addInfo.row; i < this.formData.length; i++) {
+      itemToMove = this.formData[i][changingColumn];
+      this.formData[i][changingColumn] = itemReplacing;      
+      itemReplacing = itemToMove;
+    }
+
+    // move the last item in the column
+    const newRowInfo: INewRow = {
+      totalColumns: this.displayedColumns.length,
+      columnWithData: addInfo.column,
+      columnData: itemToMove
+    }
+    
+    this.addRow(newRowInfo);
+  }
+
+  private addRow(newRowInfo: INewRow, removeInfo?: IRemoveItem): void {
+    let row: any = {};
+    for (let i = 0; i < newRowInfo.totalColumns; i++) {
+      if (i === newRowInfo.columnWithData) row['column'+i] = newRowInfo.columnData;
+      else row['column'+i] = null;
+    }
+
+    this.formData.push(row);
+    if (removeInfo) this.removeData(removeInfo);
+    this.table.renderRows();
+  }
+
+  private removeData(removeInfo: IRemoveItem): void {
+    this.formData[removeInfo.row]['column'+removeInfo.column] = null;
+  }
+
+  private checkDeleteEmptyRows(columnCount: number): void {
+    for (let i = 0; i < this.formData.length; i++) {
+      const row = this.formData[i];
+
+      for (let j = 0; j < columnCount; j++) {
+        if (row['column'+j]) break;
+        if (j === columnCount - 1) {
+          this.formData.splice(i, 1);
+        }
+      }
+    }
+
     this.table.renderRows();
   }
 }

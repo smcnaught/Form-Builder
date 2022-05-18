@@ -10,7 +10,7 @@
         class="above-droppable"
         (dragover)="onDragOver($event, rowIndex, colIndex)"
         (dragend)="onDragLeave($event)"
-        (drop)="onDrop($event)"
+        (drop)="onDrop()"
       ></div>
       
 
@@ -19,7 +19,7 @@
           class="left-droppable"
           (dragover)="onDragOver($event, rowIndex, colIndex - 1 > 0 ? colIndex : 0)"
           (dragend)="onDragLeave($event)"
-          (drop)="onDrop($event)"
+          (drop)="onDrop()"
         ></div>
 
         <div
@@ -34,7 +34,7 @@
           class="right-droppable"
           (dragover)="onDragOver($event, rowIndex, colIndex + 1)"
           (dragend)="onDragLeave($event)"
-          (drop)="onDrop($event)"
+          (drop)="onDrop()"
         ></div>
 
       </div>
@@ -43,7 +43,7 @@
         class="below-droppable"
         (dragover)="onDragOver($event, rowIndex + 1, colIndex)"
         (dragend)="onDragLeave($event)"
-        (drop)="onDrop($event)"
+        (drop)="onDrop()"
       ></div>
 
     </td>
