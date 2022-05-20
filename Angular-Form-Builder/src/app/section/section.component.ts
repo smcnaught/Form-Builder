@@ -33,7 +33,7 @@ export class SectionComponent implements OnInit {
   public displayedColumns: string[] = ['column0', 'column1'];
   public formData: any[];
 
-  private dragInfo = { draggedItemColumn: 0, draggedItemRow: 0, moveToColumn: 0, moveToRow: 0 };
+  private dragInfo = { draggedItemColumn: null, draggedItemRow: null, moveToColumn: null, moveToRow: null };
 
   public ngOnInit(): void {
     this.formData = [
@@ -45,6 +45,29 @@ export class SectionComponent implements OnInit {
   }
 
   public onDrop(): void {
+    const movingExistingItem = this.dragInfo.draggedItemColumn !== null && this.dragInfo.draggedItemColumn !== null;
+    if (movingExistingItem) this.moveExistingItem();
+    else this.addNewItem();
+  }
+
+  public onDragStart(event: DragEvent, columnIndex: number, rowIndex: number): void {
+    if (event) {
+      this.dragInfo.draggedItemColumn = columnIndex;
+      this.dragInfo.draggedItemRow = rowIndex;
+    }
+  }
+
+  public onDragOver(event: any, rowIndex: number, columnIndex: number) {
+    event.preventDefault();
+    this.dragInfo.moveToRow = rowIndex;
+    this.dragInfo.moveToColumn = columnIndex;
+  }
+
+  public onDragLeave(event: any): void {
+    event.preventDefault();
+  }
+
+  private moveExistingItem(): void {
     const movingWithinColumn: boolean = this.dragInfo.draggedItemColumn === this.dragInfo.moveToColumn;
     const draggingDown: boolean = this.dragInfo.draggedItemRow < this.dragInfo.moveToRow;
 
@@ -96,21 +119,8 @@ export class SectionComponent implements OnInit {
     this.checkDeleteEmptyRows(this.displayedColumns.length);
   }
 
-  public onDragStart(event: DragEvent, columnIndex: number, rowIndex: number): void {
-    if (event) {
-      this.dragInfo.draggedItemColumn = columnIndex;
-      this.dragInfo.draggedItemRow = rowIndex;
-    }
-  }
-
-  public onDragOver(event: any, rowIndex: number, columnIndex: number) {
-    event.preventDefault();
-    this.dragInfo.moveToRow = rowIndex;
-    this.dragInfo.moveToColumn = columnIndex;
-  }
-
-  public onDragLeave(event: any): void {
-    event.preventDefault();
+  private addNewItem(): void {
+    console.log(this.dragInfo.moveToColumn, this.dragInfo.moveToRow);
   }
 
   private addColumn(columnID: number): void {
