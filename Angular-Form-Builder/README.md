@@ -8,3 +8,4 @@
 - [ ] Ability to move between sections
 - [ ] Visually show the item we're moving
 - [ ] Visually show the area we're dragging over
+- [ ] Add draggable items to add to the table.
