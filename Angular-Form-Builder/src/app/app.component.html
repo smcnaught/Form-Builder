@@ -2,7 +2,10 @@
   type="text"
   draggable="true"
   placeholder="Text Input"
+  (dragstart)="onDragStart(DraggedElementType.text)"
 />
 
 
-<section></section>
+<section
+  [draggedElementType]="draggedElementType">
+</section>

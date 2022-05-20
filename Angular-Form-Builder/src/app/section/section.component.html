@@ -26,8 +26,8 @@
           class="draggable-element"
           draggable="true"
           (dragstart)="onDragStart($event, colIndex, rowIndex)"
+          [innerHtml]="element[column]"
           >
-          {{ element[column] }}
         </div>
 
         <div

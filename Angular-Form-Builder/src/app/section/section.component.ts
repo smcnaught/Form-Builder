@@ -1,5 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatTable } from '@angular/material/table';
+import { DomSanitizer } from '@angular/platform-browser'
 
 interface IRemoveItem {
   column: number;
@@ -22,6 +23,10 @@ interface ISwitchInfo {
   row: number;
 }
 
+export enum DraggedElementType {
+  text,
+}
+
 @Component({
   selector: 'section',
   templateUrl: './section.component.html',
@@ -29,11 +34,15 @@ interface ISwitchInfo {
 })
 export class SectionComponent implements OnInit {
   @ViewChild(MatTable) table: MatTable<any>; // TODO this type should be the same type as formData (without the array).
+  @Input() draggedElementType: DraggedElementType;
   
   public displayedColumns: string[] = ['column0', 'column1'];
   public formData: any[];
 
   private dragInfo = { draggedItemColumn: null, draggedItemRow: null, moveToColumn: null, moveToRow: null };
+  private defaultElements = { text: null };
+
+  constructor(private sanitizer: DomSanitizer) {}
 
   public ngOnInit(): void {
     this.formData = [
@@ -42,6 +51,7 @@ export class SectionComponent implements OnInit {
       { column0: 'picture of cat', column1: 'description' }, // row 2
     ]
 
+    this.setDefaultElements();
   }
 
   public onDrop(): void {
@@ -120,7 +130,20 @@ export class SectionComponent implements OnInit {
   }
 
   private addNewItem(): void {
-    console.log(this.dragInfo.moveToColumn, this.dragInfo.moveToRow);
+    let newElement;
+    if (this.draggedElementType === DraggedElementType.text) {
+      newElement = this.defaultElements.text;
+    }
+
+    let newColumn = {};
+    this.displayedColumns.forEach((col) => {
+      newColumn[col] = null;
+    })
+
+    newColumn['column' + this.dragInfo.moveToColumn] = newElement;
+
+    this.formData.splice(this.dragInfo.moveToRow, 0, newColumn);
+    this.table.renderRows();
   }
 
   private addColumn(columnID: number): void {
@@ -193,5 +216,11 @@ export class SectionComponent implements OnInit {
     }
 
     this.table.renderRows();
+  }
+
+  private setDefaultElements(): void {
+    const placeholderText: string = "text";
+    const inputField: string = `<input type='text' placeholder=${placeholderText} class='input-field' />`;
+    this.defaultElements.text = this.sanitizer.bypassSecurityTrustHtml(inputField);
   }
 }
