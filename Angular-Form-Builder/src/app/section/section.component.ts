@@ -1,58 +1,42 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { MatTable } from '@angular/material/table';
-import { DomSanitizer } from '@angular/platform-browser'
+import { Subject, Subscription } from 'rxjs';
 
-interface IRemoveItem {
-  column: number;
-  row: number;
-}
-
-interface IAddItem {
-  column: number;
-  row: number;
-}
-
-interface INewRow {
-  totalColumns: number;
-  columnWithData: number;
-  columnData: string;
-}
-
-interface ISwitchInfo {
-  column: number;
-  row: number;
-}
-
-export enum DraggedElementType {
-  text,
-}
+import { DraggedElementType, INewRow, IRemoveItem, ISwitchInfo, IAddItem, IItem } from '../shared/types';
 
 @Component({
   selector: 'section',
   templateUrl: './section.component.html',
   styleUrls: ['./section.component.scss']
 })
-export class SectionComponent implements OnInit {
+export class SectionComponent implements OnInit, OnDestroy {
   @ViewChild(MatTable) table: MatTable<any>; // TODO this type should be the same type as formData (without the array).
-  @Input() draggedElementType: DraggedElementType;
+  @Input() typeOfDraggedElement: DraggedElementType;
+  @Input() itemChangedFromSettings: Subject<IItem>;
+  @Output() selectedItem = new EventEmitter<IItem>();
   
   public displayedColumns: string[] = ['column0', 'column1'];
-  public formData: any[];
+  public formData: { [key: string]: IItem }[];
 
   private dragInfo = { draggedItemColumn: null, draggedItemRow: null, moveToColumn: null, moveToRow: null };
-  private defaultElements = { text: null };
-
-  constructor(private sanitizer: DomSanitizer) {}
+  private selectedItemLocation = { column: null, row: null };
+  private subscriptions = new Subscription();
 
   public ngOnInit(): void {
     this.formData = [
-      { column0: 'text box', column1: 'multiple choice' }, // row 0
-      { column0: 'checkboxes', column1: 'user input' }, // row 1
-      { column0: 'picture of cat', column1: 'description' }, // row 2
+      { 'column0': { name: 'name-pup', type: DraggedElementType.text, value: 'pup' }, 'column1': { name: 'name-bird', type: DraggedElementType.text, value: 'bird' } }, // row 0
+      { 'column0': { name: 'name-cat', type: DraggedElementType.text, value: 'cat' }, 'column1': { name: 'name-monkey', type: DraggedElementType.text, value: 'monkey' } }, // row 1
+      { 'column0': { name: 'name-dog', type: DraggedElementType.text, value: 'dog' }, 'column1': { name: 'name-tiger', type: DraggedElementType.text, value: 'tiger' } }, // row 2
     ]
 
-    this.setDefaultElements();
+    this.setupSettingsListener();
   }
+
+  public ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+
+  public get draggedElementEnum() { return DraggedElementType };
 
   public onDrop(): void {
     const movingExistingItem = this.dragInfo.draggedItemColumn !== null && this.dragInfo.draggedItemColumn !== null;
@@ -77,6 +61,12 @@ export class SectionComponent implements OnInit {
     event.preventDefault();
   }
 
+  public selectItem(item: IItem, column: number, row: number): void {
+    this.selectedItemLocation.column = column;
+    this.selectedItemLocation.row = row;
+    this.selectedItem.emit(item);
+  }
+
   private moveExistingItem(): void {
     const movingWithinColumn: boolean = this.dragInfo.draggedItemColumn === this.dragInfo.moveToColumn;
     const draggingDown: boolean = this.dragInfo.draggedItemRow < this.dragInfo.moveToRow;
@@ -85,7 +75,7 @@ export class SectionComponent implements OnInit {
 
     // add new row
     if (this.dragInfo.moveToRow === this.formData.length) {
-      const dataToMove: string = this.formData[this.dragInfo.draggedItemRow]['column'+this.dragInfo.draggedItemColumn];
+      const dataToMove: IItem = this.formData[this.dragInfo.draggedItemRow]['column'+this.dragInfo.draggedItemColumn];
       const newRowInfo: INewRow = {
         totalColumns: this.displayedColumns.length,
         columnWithData: this.dragInfo.moveToColumn,
@@ -131,25 +121,25 @@ export class SectionComponent implements OnInit {
 
   private addNewItem(): void {
     let newElement;
-    if (this.draggedElementType === DraggedElementType.text) {
-      newElement = this.defaultElements.text;
+    if (this.typeOfDraggedElement === DraggedElementType.text) {
+      newElement = { type: this.typeOfDraggedElement, value: 'placeholder' }
     }
 
-    let newColumn = {};
+    let newRow = {};
     this.displayedColumns.forEach((col) => {
-      newColumn[col] = null;
+      newRow[col] = { type: DraggedElementType.none, value: null }
     })
 
-    newColumn['column' + this.dragInfo.moveToColumn] = newElement;
+    newRow['column' + this.dragInfo.moveToColumn] = newElement;
 
-    this.formData.splice(this.dragInfo.moveToRow, 0, newColumn);
+    this.formData.splice(this.dragInfo.moveToRow, 0, newRow);
     this.table.renderRows();
   }
 
   private addColumn(columnID: number): void {
     const columnName: string = 'column' + columnID;
     this.formData.forEach((row) => {
-      row[columnName] = null;
+      row[columnName] = { name: '', type: DraggedElementType.none, value: '' };
     })
 
     this.displayedColumns.push(columnName);
@@ -191,7 +181,7 @@ export class SectionComponent implements OnInit {
     let row: any = {};
     for (let i = 0; i < newRowInfo.totalColumns; i++) {
       if (i === newRowInfo.columnWithData) row['column'+i] = newRowInfo.columnData;
-      else row['column'+i] = null;
+      else row['column'+i] = { type: DraggedElementType.none, value: null };
     }
 
     this.formData.push(row);
@@ -200,7 +190,7 @@ export class SectionComponent implements OnInit {
   }
 
   private removeData(removeInfo: IRemoveItem): void {
-    this.formData[removeInfo.row]['column'+removeInfo.column] = null;
+    this.formData[removeInfo.row]['column'+removeInfo.column] = { name: '', type: DraggedElementType.none, value: null };
   }
 
   private checkDeleteEmptyRows(columnCount: number): void {
@@ -218,9 +208,16 @@ export class SectionComponent implements OnInit {
     this.table.renderRows();
   }
 
-  private setDefaultElements(): void {
-    const placeholderText: string = "text";
-    const inputField: string = `<input type='text' placeholder=${placeholderText} class='input-field' />`;
-    this.defaultElements.text = this.sanitizer.bypassSecurityTrustHtml(inputField);
+  private setupSettingsListener(): void {
+    const settingsSub = this.itemChangedFromSettings.subscribe((updatedItem: IItem) => {
+      this.updateItem(updatedItem)
+    })
+
+    this.subscriptions.add(settingsSub);
+  }
+
+  private updateItem(updatedItem: IItem): void {
+    this.formData[this.selectedItemLocation.column][this.selectedItemLocation.row] = updatedItem;
+    this.table.renderRows();
   }
 }

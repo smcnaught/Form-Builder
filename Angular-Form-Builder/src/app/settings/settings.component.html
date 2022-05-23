@@ -1,0 +1,26 @@
+<div *ngIf="item">
+  <div>ITEM SETTINGS: </div>
+  
+  <div>
+    <span>Item Name: </span>
+    <span>
+      <input
+        type='text'
+        placeholder='Item Name'
+        [(ngModel)]='item.name'
+        (ngModelChange)="updateItem()" />
+    </span>
+  </div>
+
+  <div>
+    <span>Item Value: </span>
+    <span>
+      <input
+        type='text'
+        placeholder='Item Value'
+        [(ngModel)]='item.value'
+        (ngModelChange)="updateItem()" />
+    </span>
+  </div>
+
+</div>

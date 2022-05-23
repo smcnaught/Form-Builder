@@ -7,5 +7,14 @@
 
 
 <section
-  [draggedElementType]="draggedElementType">
+  [typeOfDraggedElement]="draggedElementType"
+  [itemChangedFromSettings]="selectedItemChanged"
+  (selectedItem)="onSelectedItemChange($event)"
+  >
 </section>
+
+<br><br>
+<settings
+  [item]="selectedItem"
+  (updatedItem)="onUpdateSelectedItem($event)">
+</settings>
