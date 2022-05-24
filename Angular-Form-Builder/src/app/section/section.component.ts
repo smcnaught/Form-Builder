@@ -14,7 +14,7 @@ export class SectionComponent implements OnInit, OnDestroy {
   @Input() section: ISection;
   @Input() typeOfDraggedElement: DraggedElementType;
   @Input() itemChangedFromSettings: Subject<IItem>;
-  @Input() itemMovedFromOtherSection: IItem;
+  @Input() itemMovedFromOtherSection: IItem = null; // needs to be set to null
   @Output() dragBetweenSections = new EventEmitter<IDragBetweenSectionsData>();
   @Output() selectedItem = new EventEmitter<IItem>();
   @Output() removeFromSectionItemCameFrom = new EventEmitter<boolean>();
@@ -38,13 +38,14 @@ export class SectionComponent implements OnInit, OnDestroy {
 
   public get draggedElementEnum() { return DraggedElementType };
 
-  public onDrop(): void {
+  public onDrop(movingToExistingRow?: boolean): void {
     const movingItemFromThisSection = this.dragInfo.draggedItemColumn !== null && this.dragInfo.draggedItemColumn !== null;
     const movingFromDifferentSection = !movingItemFromThisSection && this.itemMovedFromOtherSection !== null;
 
     if (movingItemFromThisSection) this.moveExistingItem();
-    else if (movingFromDifferentSection) this.addItemFromOtherSection();
-    else this.addNewItem();
+    else if (movingFromDifferentSection) this.addItemFromOtherSection(movingToExistingRow);
+    else this.addNewItem(movingToExistingRow);
+    this.resetDragInfo();
   }
 
   public onDragStart(event: DragEvent, columnIndex: number, rowIndex: number): void {
@@ -138,31 +139,44 @@ export class SectionComponent implements OnInit, OnDestroy {
     this.checkDeleteEmptyRows(this.displayedColumns.length);
   }
 
-  private addItemFromOtherSection(): void {
-    let newRow = {};
-    this.displayedColumns.forEach((column: string) => {
-      newRow[column] = { type: DraggedElementType.none, value: '', name: '' }
-    })
+  private addItemFromOtherSection(rowAlreadyExists: boolean): void {
+    if (rowAlreadyExists) {
+      this.sectionData[this.dragInfo.moveToRow]['column'+ this.dragInfo.moveToColumn] = this.itemMovedFromOtherSection;
+    }
+    else {
+      let newRow = {};
+      this.displayedColumns.forEach((column: string) => {
+        newRow[column] = { type: DraggedElementType.none, value: '', name: '' }
+      })
+  
+      newRow['column' + this.dragInfo.moveToColumn] = this.itemMovedFromOtherSection;
+      this.sectionData.splice(this.dragInfo.moveToRow, 0, newRow);
+    }
 
-    newRow['column' + this.dragInfo.moveToColumn] = this.itemMovedFromOtherSection;
-    this.sectionData.splice(this.dragInfo.moveToRow, 0, newRow);
-    this.table.renderRows();
     this.removeFromSectionItemCameFrom.emit(true);
+    this.itemMovedFromOtherSection = null; // reset
+    this.table.renderRows();
   }
 
-  private addNewItem(): void {
+  private addNewItem(rowAlreadyExists: boolean): void {
     let newItem: IItem;
     if (this.typeOfDraggedElement === DraggedElementType.text) {
       newItem = { type: this.typeOfDraggedElement, value: '', name: '' }
     }
 
-    let newRow = {};
-    this.displayedColumns.forEach((col) => {
-      newRow[col] = { type: DraggedElementType.none, value: '', name: '' }
-    })
+    if (rowAlreadyExists) {
+      this.sectionData[this.dragInfo.moveToRow]['column'+ this.dragInfo.moveToColumn] = newItem;
+    }
+    else {
+      let newRow = {};
+      this.displayedColumns.forEach((col) => {
+        newRow[col] = { type: DraggedElementType.none, value: '', name: '' }
+      })
 
-    newRow['column' + this.dragInfo.moveToColumn] = newItem;
-    this.sectionData.splice(this.dragInfo.moveToRow, 0, newRow);
+      newRow['column' + this.dragInfo.moveToColumn] = newItem;
+      this.sectionData.splice(this.dragInfo.moveToRow, 0, newRow);
+    }
+
     this.table.renderRows();
   }
 
@@ -240,15 +254,18 @@ export class SectionComponent implements OnInit, OnDestroy {
   }
 
   private setupPage(): void {
+    this.resetDragInfo();
+    this.sectionData = this.section.data;
+    this.sectionSettings = this.section.settings;
+  }
+
+  private resetDragInfo(): void {
     this.dragInfo = {
       draggedItemColumn: null,
       draggedItemRow: null,
       moveToColumn: null,
       moveToRow: null,
     }
-
-    this.sectionData = this.section.data;
-    this.sectionSettings = this.section.settings;
   }
 
   private setupSettingsListener(): void {

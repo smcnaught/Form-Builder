@@ -3,13 +3,8 @@
 <table mat-table [dataSource]="sectionData" class="mat-elevation-z8">
   <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns; let colIndex = index;">
     
-    <td
-      mat-cell
-      *matCellDef="let element; let rowIndex = index;"
-    >
-
-      <div *ngIf="element[column].type > 0">
-      
+    <td mat-cell *matCellDef="let element; let rowIndex = index;">
+      <div *ngIf="element[column].type != draggedElementEnum.none">
         <div
           class="above-droppable"
           (dragover)="onDragOver($event, rowIndex, colIndex)"
@@ -26,12 +21,13 @@
           ></div>
 
           <div
+            *ngIf="element[column].type === draggedElementEnum.text"
             class="draggable-element"
             draggable="true"
             (dragstart)="onDragStart($event, colIndex, rowIndex)"
             (click)="selectItem(element[column], colIndex, rowIndex)" 
             >
-            <span *ngIf="element[column].type === draggedElementEnum.text">
+            <span>
               <label for="test">
                 <input
                   placeholder="Enter Label"
@@ -63,8 +59,14 @@
           (dragend)="onDragLeave($event)"
           (drop)="onDrop()"
         ></div>
-      
       </div>
+
+      <div *ngIf="element[column].type === draggedElementEnum.none"
+        class="all-droppable"
+        (dragover)="onDragOver($event, rowIndex, colIndex)"
+        (dragend)="onDragLeave($event)"
+        (drop)="onDrop(true)"
+      ></div>
 
     </td>
   </ng-container>

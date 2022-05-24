@@ -12,7 +12,7 @@ export class AppComponent implements OnInit {
   public selectedItem: IItem;
   public selectedItemChanged: Subject<IItem> = new Subject();
   public allSections: Array<ISection>;
-  public itemToAddToOtherSection: IItem;
+  public itemToAddToOtherSection: IItem = null; // needs to be set to null
   public draggedElementType: DraggedElementType;
 
   private removeItemInfo: IDragBetweenSectionsData;
@@ -35,7 +35,6 @@ export class AppComponent implements OnInit {
 
   public onDragNewItemStart(elementType: DraggedElementType): void {
     this.draggedElementType = elementType;
-    this.itemToAddToOtherSection = null;
   }
 
   public setDataForDragBetweenSections(dragInfo: IDragBetweenSectionsData): void {
