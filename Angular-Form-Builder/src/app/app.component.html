@@ -2,16 +2,21 @@
   type="text"
   draggable="true"
   placeholder="Text Input"
-  (dragstart)="onDragStart(DraggedElementType.text)"
+  (dragstart)="onDragNewItemStart(DraggedElementType.text)"
 />
 
-
-<section
-  [typeOfDraggedElement]="draggedElementType"
-  [itemChangedFromSettings]="selectedItemChanged"
-  (selectedItem)="onSelectedItemChange($event)"
-  >
-</section>
+<div *ngFor="let section of allSections; let i = index;">
+  <section
+    [section]="section"
+    [typeOfDraggedElement]="draggedElementType"
+    [itemChangedFromSettings]="selectedItemChanged"
+    [itemMovedFromOtherSection]="itemToAddToOtherSection"
+    (dragBetweenSections)="setDataForDragBetweenSections($event)"
+    (selectedItem)="onSelectedItemChange($event)"
+    (removeFromSectionItemCameFrom)="removeItem($event)"
+    >
+  </section>
+</div>
 
 <br><br>
 <settings

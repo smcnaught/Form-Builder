@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } 
 import { MatTable } from '@angular/material/table';
 import { Subject, Subscription } from 'rxjs';
 
-import { DraggedElementType, INewRow, IRemoveItem, ISwitchInfo, IAddItem, IItem } from '../shared/types';
+import { DraggedElementType, INewRow, IRemoveItem, ISwitchInfo, IAddItem, IItem, ISectionSettings, IDragInfo, IDragBetweenSectionsData, ISectionData, ISection } from '../shared/types';
 
 @Component({
   selector: 'section',
@@ -10,25 +10,25 @@ import { DraggedElementType, INewRow, IRemoveItem, ISwitchInfo, IAddItem, IItem 
   styleUrls: ['./section.component.scss']
 })
 export class SectionComponent implements OnInit, OnDestroy {
-  @ViewChild(MatTable) table: MatTable<any>; // TODO this type should be the same type as formData (without the array).
+  @ViewChild(MatTable) table: MatTable<ISectionData>;
+  @Input() section: ISection;
   @Input() typeOfDraggedElement: DraggedElementType;
   @Input() itemChangedFromSettings: Subject<IItem>;
+  @Input() itemMovedFromOtherSection: IItem;
+  @Output() dragBetweenSections = new EventEmitter<IDragBetweenSectionsData>();
   @Output() selectedItem = new EventEmitter<IItem>();
+  @Output() removeFromSectionItemCameFrom = new EventEmitter<boolean>();
   
   public displayedColumns: string[] = ['column0', 'column1'];
-  public formData: { [key: string]: IItem }[];
+  public sectionData: ISectionData[];
+  public sectionSettings: ISectionSettings;
 
-  private dragInfo = { draggedItemColumn: null, draggedItemRow: null, moveToColumn: null, moveToRow: null };
+  private dragInfo: IDragInfo;
   private selectedItemLocation = { column: null, row: null };
   private subscriptions = new Subscription();
 
   public ngOnInit(): void {
-    this.formData = [
-      { 'column0': { name: 'name-pup', type: DraggedElementType.text, value: 'pup' }, 'column1': { name: 'name-bird', type: DraggedElementType.text, value: 'bird' } }, // row 0
-      { 'column0': { name: 'name-cat', type: DraggedElementType.text, value: 'cat' }, 'column1': { name: 'name-monkey', type: DraggedElementType.text, value: 'monkey' } }, // row 1
-      { 'column0': { name: 'name-dog', type: DraggedElementType.text, value: 'dog' }, 'column1': { name: 'name-tiger', type: DraggedElementType.text, value: 'tiger' } }, // row 2
-    ]
-
+    this.setupPage();
     this.setupSettingsListener();
   }
 
@@ -39,8 +39,11 @@ export class SectionComponent implements OnInit, OnDestroy {
   public get draggedElementEnum() { return DraggedElementType };
 
   public onDrop(): void {
-    const movingExistingItem = this.dragInfo.draggedItemColumn !== null && this.dragInfo.draggedItemColumn !== null;
-    if (movingExistingItem) this.moveExistingItem();
+    const movingItemFromThisSection = this.dragInfo.draggedItemColumn !== null && this.dragInfo.draggedItemColumn !== null;
+    const movingFromDifferentSection = !movingItemFromThisSection && this.itemMovedFromOtherSection !== null;
+
+    if (movingItemFromThisSection) this.moveExistingItem();
+    else if (movingFromDifferentSection) this.addItemFromOtherSection();
     else this.addNewItem();
   }
 
@@ -48,6 +51,14 @@ export class SectionComponent implements OnInit, OnDestroy {
     if (event) {
       this.dragInfo.draggedItemColumn = columnIndex;
       this.dragInfo.draggedItemRow = rowIndex;
+
+      const dragBetweenSectionsData: IDragBetweenSectionsData = {
+        draggedColumn: this.dragInfo.draggedItemColumn,
+        draggedRow: this.dragInfo.draggedItemRow,
+        fromSection: this.sectionSettings.id
+      }
+
+      this.dragBetweenSections.emit(dragBetweenSectionsData);
     }
   }
 
@@ -67,6 +78,12 @@ export class SectionComponent implements OnInit, OnDestroy {
     this.selectedItem.emit(item);
   }
 
+  private removeItem(removeInfo: IRemoveItem): void {
+    if (this.sectionSettings.id === removeInfo.sectionID) {
+      this.sectionData[removeInfo.row]['column'+removeInfo.column] = { name: '', type: DraggedElementType.none, value: '' };
+    }
+  }
+
   private moveExistingItem(): void {
     const movingWithinColumn: boolean = this.dragInfo.draggedItemColumn === this.dragInfo.moveToColumn;
     const draggingDown: boolean = this.dragInfo.draggedItemRow < this.dragInfo.moveToRow;
@@ -74,8 +91,8 @@ export class SectionComponent implements OnInit, OnDestroy {
     if (movingWithinColumn && draggingDown) this.dragInfo.moveToRow--;
 
     // add new row
-    if (this.dragInfo.moveToRow === this.formData.length) {
-      const dataToMove: IItem = this.formData[this.dragInfo.draggedItemRow]['column'+this.dragInfo.draggedItemColumn];
+    if (this.dragInfo.moveToRow === this.sectionData.length) {
+      const dataToMove: IItem = this.sectionData[this.dragInfo.draggedItemRow]['column'+this.dragInfo.draggedItemColumn];
       const newRowInfo: INewRow = {
         totalColumns: this.displayedColumns.length,
         columnWithData: this.dragInfo.moveToColumn,
@@ -85,6 +102,7 @@ export class SectionComponent implements OnInit, OnDestroy {
       let removeInfo: IRemoveItem = {
         column: this.dragInfo.draggedItemColumn,
         row: this.dragInfo.draggedItemRow,
+        sectionID: this.sectionSettings.id
       }
 
       this.addRow(newRowInfo, removeInfo);
@@ -106,6 +124,7 @@ export class SectionComponent implements OnInit, OnDestroy {
       let removeInfo: IRemoveItem = {
         column: this.dragInfo.draggedItemColumn,
         row: this.dragInfo.draggedItemRow,
+        sectionID: this.sectionSettings.id
       }
 
       let addInfo: IAddItem = {
@@ -119,26 +138,37 @@ export class SectionComponent implements OnInit, OnDestroy {
     this.checkDeleteEmptyRows(this.displayedColumns.length);
   }
 
+  private addItemFromOtherSection(): void {
+    let newRow = {};
+    this.displayedColumns.forEach((column: string) => {
+      newRow[column] = { type: DraggedElementType.none, value: '', name: '' }
+    })
+
+    newRow['column' + this.dragInfo.moveToColumn] = this.itemMovedFromOtherSection;
+    this.sectionData.splice(this.dragInfo.moveToRow, 0, newRow);
+    this.table.renderRows();
+    this.removeFromSectionItemCameFrom.emit(true);
+  }
+
   private addNewItem(): void {
-    let newElement;
+    let newItem: IItem;
     if (this.typeOfDraggedElement === DraggedElementType.text) {
-      newElement = { type: this.typeOfDraggedElement, value: 'placeholder' }
+      newItem = { type: this.typeOfDraggedElement, value: '', name: '' }
     }
 
     let newRow = {};
     this.displayedColumns.forEach((col) => {
-      newRow[col] = { type: DraggedElementType.none, value: null }
+      newRow[col] = { type: DraggedElementType.none, value: '', name: '' }
     })
 
-    newRow['column' + this.dragInfo.moveToColumn] = newElement;
-
-    this.formData.splice(this.dragInfo.moveToRow, 0, newRow);
+    newRow['column' + this.dragInfo.moveToColumn] = newItem;
+    this.sectionData.splice(this.dragInfo.moveToRow, 0, newRow);
     this.table.renderRows();
   }
 
   private addColumn(columnID: number): void {
     const columnName: string = 'column' + columnID;
-    this.formData.forEach((row) => {
+    this.sectionData.forEach((row) => {
       row[columnName] = { name: '', type: DraggedElementType.none, value: '' };
     })
 
@@ -147,23 +177,23 @@ export class SectionComponent implements OnInit, OnDestroy {
   }
 
   private switchItemsInColumn(item1Position: ISwitchInfo, item2Position: ISwitchInfo): void {
-    const newItem1 = this.formData[item2Position.row]['column'+item2Position.column];
-    const newItem2 = this.formData[item1Position.row]['column'+item1Position.column];
+    const newItem1 = this.sectionData[item2Position.row]['column'+item2Position.column];
+    const newItem2 = this.sectionData[item1Position.row]['column'+item1Position.column];
 
-    this.formData[item1Position.row]['column'+item1Position.column] = newItem1;
-    this.formData[item2Position.row]['column'+item2Position.column] = newItem2;
+    this.sectionData[item1Position.row]['column'+item1Position.column] = newItem1;
+    this.sectionData[item2Position.row]['column'+item2Position.column] = newItem2;
     this.table.renderRows();
   }
 
   private moveBetweenColumns(removeInfo: IRemoveItem, addInfo: IAddItem): void {
     let itemToMove;
-    let itemReplacing = this.formData[removeInfo.row]['column'+removeInfo.column];
-    this.removeData(removeInfo);
+    let itemReplacing = this.sectionData[removeInfo.row]['column'+removeInfo.column];
+    this.removeItem(removeInfo);
     
     const changingColumn: string = 'column'+addInfo.column;
-    for (let i = addInfo.row; i < this.formData.length; i++) {
-      itemToMove = this.formData[i][changingColumn];
-      this.formData[i][changingColumn] = itemReplacing;      
+    for (let i = addInfo.row; i < this.sectionData.length; i++) {
+      itemToMove = this.sectionData[i][changingColumn];
+      this.sectionData[i][changingColumn] = itemReplacing;      
       itemReplacing = itemToMove;
     }
 
@@ -184,28 +214,41 @@ export class SectionComponent implements OnInit, OnDestroy {
       else row['column'+i] = { type: DraggedElementType.none, value: null };
     }
 
-    this.formData.push(row);
-    if (removeInfo) this.removeData(removeInfo);
+    this.sectionData.push(row);
+    if (removeInfo) this.removeItem(removeInfo);
     this.table.renderRows();
   }
 
-  private removeData(removeInfo: IRemoveItem): void {
-    this.formData[removeInfo.row]['column'+removeInfo.column] = { name: '', type: DraggedElementType.none, value: null };
-  }
-
   private checkDeleteEmptyRows(columnCount: number): void {
-    for (let i = 0; i < this.formData.length; i++) {
-      const row = this.formData[i];
+    for (let i = 0; i < this.sectionData.length; i++) {
+      const row = this.sectionData[i];
 
       for (let j = 0; j < columnCount; j++) {
         if (row['column'+j]) break;
         if (j === columnCount - 1) {
-          this.formData.splice(i, 1);
+          this.sectionData.splice(i, 1);
         }
       }
     }
 
     this.table.renderRows();
+  }
+
+  private updateItem(updatedItem: IItem): void {
+    this.sectionData[this.selectedItemLocation.column][this.selectedItemLocation.row] = updatedItem;
+    this.table.renderRows();
+  }
+
+  private setupPage(): void {
+    this.dragInfo = {
+      draggedItemColumn: null,
+      draggedItemRow: null,
+      moveToColumn: null,
+      moveToRow: null,
+    }
+
+    this.sectionData = this.section.data;
+    this.sectionSettings = this.section.settings;
   }
 
   private setupSettingsListener(): void {
@@ -214,10 +257,5 @@ export class SectionComponent implements OnInit, OnDestroy {
     })
 
     this.subscriptions.add(settingsSub);
-  }
-
-  private updateItem(updatedItem: IItem): void {
-    this.formData[this.selectedItemLocation.column][this.selectedItemLocation.row] = updatedItem;
-    this.table.renderRows();
   }
 }

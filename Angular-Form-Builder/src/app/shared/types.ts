@@ -7,6 +7,7 @@ export interface IItem {
 export interface IRemoveItem {
   column: number;
   row: number;
+  sectionID: number;
 }
 
 export interface IAddItem {
@@ -24,6 +25,34 @@ export interface ISwitchInfo {
   column: number;
   row: number;
 }
+
+export interface IDragInfo {
+  draggedItemColumn: number;
+  draggedItemRow: number;
+  moveToColumn: number;
+  moveToRow: number;
+}
+
+export interface ISection {
+  settings: ISectionSettings,
+  data: ISectionData[]
+}
+
+export interface ISectionSettings {
+  id: number;
+  title: string;
+}
+
+export interface ISectionData {
+  [column: string]: IItem 
+}
+
+export interface IDragBetweenSectionsData {
+  draggedColumn: number;
+  draggedRow: number;
+  fromSection: number;
+}
+
 
 export enum DraggedElementType {
   none,

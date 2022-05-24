@@ -1,6 +1,6 @@
-<h1>Form Builder</h1>
+<h1>{{ sectionSettings.title }}</h1>
 
-<table mat-table [dataSource]="formData" class="mat-elevation-z8">
+<table mat-table [dataSource]="sectionData" class="mat-elevation-z8">
   <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns; let colIndex = index;">
     
     <td
@@ -33,14 +33,18 @@
             >
             <span *ngIf="element[column].type === draggedElementEnum.text">
               <label for="test">
-                <input [value]='element[column].name'/>
+                <input
+                  placeholder="Enter Label"
+                  [(ngModel)]='element[column].name'
+                  (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
               </label>
               <input
                 id="test"
                 type='text'
-                placeholder='change me'
+                placeholder='Enter Text'
                 class='input-field'
-                [value]='element[column].value' />
+                [(ngModel)]='element[column].value' 
+                (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
             </span>
           </div>
 
