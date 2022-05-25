@@ -46,6 +46,7 @@ export class SectionComponent implements OnInit, OnDestroy {
     else if (movingFromDifferentSection) this.addItemFromOtherSection(movingToExistingRow);
     else this.addNewItem(movingToExistingRow);
     this.resetDragInfo();
+    this.checkDeleteEmptyRows(this.displayedColumns.length);
   }
 
   public onDragStart(event: DragEvent, columnIndex: number, rowIndex: number): void {
@@ -135,8 +136,6 @@ export class SectionComponent implements OnInit, OnDestroy {
 
       this.moveBetweenColumns(removeInfo, addInfo);
     }
-
-    this.checkDeleteEmptyRows(this.displayedColumns.length);
   }
 
   private addItemFromOtherSection(rowAlreadyExists: boolean): void {
@@ -238,9 +237,10 @@ export class SectionComponent implements OnInit, OnDestroy {
       const row = this.sectionData[i];
 
       for (let j = 0; j < columnCount; j++) {
-        if (row['column'+j]) break;
+        if (row['column'+j].type !== DraggedElementType.none) break;
         if (j === columnCount - 1) {
           this.sectionData.splice(i, 1);
+          this.checkDeleteEmptyRows(this.displayedColumns.length);
         }
       }
     }

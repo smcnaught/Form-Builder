@@ -81,6 +81,28 @@ export class AppComponent implements OnInit {
         value: ''
       }
     }
+
+    this.checkDeleteEmptyRows();
+  }
+
+  private checkDeleteEmptyRows(): void {
+    this.allSections.forEach((section: ISection, sectionIndex: number) => {
+      for (let i = 0; i < section.data.length; i++) {
+        const row = section.data[i];
+
+        for(let columns = Object.keys(row), j = 0, end = columns.length; j < end; j++) {
+          const column = columns[j];
+          const isLast = j === columns.length - 1;
+
+          if (row[column].type !== DraggedElementType.none) break;
+          if (isLast) {
+            this.allSections[sectionIndex].data.splice(i, 1);
+            this.allSections = JSON.parse(JSON.stringify(this.allSections)); // have to deep clone or it doesn't notice the change.
+            this.checkDeleteEmptyRows();
+          }
+        };
+      }
+    })
   }
 
   private getIndexOfSection(sectionID: number): number {
