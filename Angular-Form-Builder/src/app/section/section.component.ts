@@ -63,13 +63,13 @@ export class SectionComponent implements OnInit, OnDestroy {
     }
   }
 
-  public onDragOver(event: any, rowIndex: number, columnIndex: number) {
+  public onDragOver(event: DragEvent, rowIndex: number, columnIndex: number) {
     event.preventDefault();
     this.dragInfo.moveToRow = rowIndex;
     this.dragInfo.moveToColumn = columnIndex;
   }
 
-  public onDragLeave(event: any): void {
+  public onDragLeave(event: DragEvent): void {
     event.preventDefault();
   }
 

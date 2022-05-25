@@ -1,35 +1,11 @@
-.example-draggable {
-  border-style: solid;
-  font-weight: normal;
+.section-border {
+  border: solid blue;
+  margin-bottom: 10px;
+  padding: 10px;
 }
 
-.above-droppable {
-  padding: 20px;
-}
-
-.below-droppable {
-  padding: 20px;
-}
-
-.left-droppable {
-  float: left;
-  padding: 20px;
-}
-
-.draggable-element {
-  float: left;
-}
-
-.right-droppable {
-  float: left;
-  padding: 20px;
-}
-
-
-table {
-  width: 100%;
-}
-
-button {
-  margin: 16px 8px;
+.section-droppable {
+  padding: 50px;
+  margin-top: 20px;
+  background: yellow;
 }

@@ -6,7 +6,17 @@
 />
 
 <div *ngFor="let section of allSections; let i = index;">
+  <div
+    class="section-droppable"
+    (dragover)="onDragOver($event, i - 1)"
+    (dragend)="onDragLeave($event)"
+    (drop)="onDropSection()"
+  ></div>
+
   <section
+    class="section-border"
+    draggable="true"
+    (dragstart)="onDragSection(i)"
     [section]="section"
     [typeOfDraggedElement]="draggedElementType"
     [itemChangedFromSettings]="selectedItemChanged"
@@ -16,6 +26,13 @@
     (removeFromSectionItemCameFrom)="removeItem($event)"
     >
   </section>
+
+  <div
+    class="section-droppable"
+    (dragover)="onDragOver($event, i + 1)"
+    (dragend)="onDragLeave($event)"
+    (drop)="onDropSection()"
+  ></div>
 </div>
 
 <br><br>
