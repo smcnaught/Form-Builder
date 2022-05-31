@@ -1,7 +1,7 @@
 export interface IItem {
   name: string;
   type: DraggedElementType,
-  value: string;
+  value: any;
 }
 
 export interface IRemoveItem {
@@ -57,4 +57,5 @@ export interface IDragBetweenSectionsData {
 export enum DraggedElementType {
   none,
   text,
+  number,
 }

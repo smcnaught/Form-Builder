@@ -5,6 +5,15 @@
   (dragstart)="onDragNewItemStart(DraggedElementType.text)"
 />
 
+<br><br>
+
+<input
+  type="number"
+  draggable="true"
+  placeholder="Number Input"
+  (dragstart)="onDragNewItemStart(DraggedElementType.number)"
+/>
+
 <div *ngFor="let section of allSections; let i = index;">
   <div
     class="section-droppable"

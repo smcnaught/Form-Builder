@@ -13,7 +13,7 @@
 - [ ] Should be able to change the width of an item using settings pane. 
 - [ ] Add draggable items to add to the table:
   - [X] Text Input
-  - [ ] Number Input (input but only allow number)
+  - [X] Number Input (input but only allow number)
   - [ ] Date and Time Input
   - [ ] Multiple Choice Input
   - [ ] Multimedia Input

@@ -159,7 +159,7 @@ export class SectionComponent implements OnInit, OnDestroy {
 
   private addNewItem(rowAlreadyExists: boolean): void {
     let newItem: IItem;
-    if (this.typeOfDraggedElement === DraggedElementType.text) {
+    if (this.typeOfDraggedElement === DraggedElementType.text || this.typeOfDraggedElement === DraggedElementType.number) {
       newItem = { type: this.typeOfDraggedElement, value: '', name: '' }
     }
 

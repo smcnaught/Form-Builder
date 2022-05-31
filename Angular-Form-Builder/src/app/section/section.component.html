@@ -35,9 +35,31 @@
                   (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
               </label>
               <input
-                id="test"
                 type='text'
                 placeholder='Enter Text'
+                class='input-field'
+                [(ngModel)]='element[column].value' 
+                (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
+            </span>
+          </div>
+
+          <div
+            *ngIf="element[column].type === draggedElementEnum.number"
+            class="draggable-element"
+            draggable="true"
+            (dragstart)="onDragStart($event, colIndex, rowIndex)"
+            (click)="selectItem(element[column], colIndex, rowIndex)" 
+            >
+            <span>
+              <label for="test">
+                <input
+                  placeholder="Enter Label"
+                  [(ngModel)]='element[column].name'
+                  (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
+              </label>
+              <input
+                type='number'
+                placeholder='Enter Number'
                 class='input-field'
                 [(ngModel)]='element[column].value' 
                 (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
