@@ -162,6 +162,9 @@ export class SectionComponent implements OnInit, OnDestroy {
     if (this.typeOfDraggedElement === DraggedElementType.text || this.typeOfDraggedElement === DraggedElementType.number) {
       newItem = { type: this.typeOfDraggedElement, value: '', name: '' }
     }
+    else if (this.typeOfDraggedElement === DraggedElementType.dateTime) {
+      newItem = { type: this.typeOfDraggedElement, value: { date: '', time: '' }, name: '' }
+    }
 
     if (rowAlreadyExists) {
       this.sectionData[this.dragInfo.moveToRow]['column'+ this.dragInfo.moveToColumn] = newItem;

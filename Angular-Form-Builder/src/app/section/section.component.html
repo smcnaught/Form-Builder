@@ -28,13 +28,14 @@
             (click)="selectItem(element[column], colIndex, rowIndex)" 
             >
             <span>
-              <label for="test">
+              <label for="textInput">
                 <input
                   placeholder="Enter Label"
                   [(ngModel)]='element[column].name'
                   (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
               </label>
               <input
+                id="textInput"
                 type='text'
                 placeholder='Enter Text'
                 class='input-field'
@@ -51,18 +52,44 @@
             (click)="selectItem(element[column], colIndex, rowIndex)" 
             >
             <span>
-              <label for="test">
+              <label for="numberInput">
                 <input
                   placeholder="Enter Label"
                   [(ngModel)]='element[column].name'
                   (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
               </label>
               <input
+                id="numberInput"
                 type='number'
                 placeholder='Enter Number'
                 class='input-field'
                 [(ngModel)]='element[column].value' 
                 (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
+            </span>
+          </div>
+
+          <div
+            *ngIf="element[column].type === draggedElementEnum.dateTime"
+            class="draggable-element"
+            draggable="true"
+            (dragstart)="onDragStart($event, colIndex, rowIndex)"
+            (click)="selectItem(element[column], colIndex, rowIndex)" 
+            >
+            <span>
+              <label for="dateTimeInput">
+                <input
+                  placeholder="Enter Label"
+                  [(ngModel)]='element[column].name'
+                  (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
+              </label>
+              <div class='input-field'>
+                <input
+                  id="dateTimeInput"
+                  type='date'
+                  [(ngModel)]='element[column].value.date' 
+                  (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
+                <input type="time" [(ngModel)]='element[column].value.time' (ngModelChange)="selectItem(element[column], colIndex, rowIndex)"/>
+              </div>
             </span>
           </div>
 

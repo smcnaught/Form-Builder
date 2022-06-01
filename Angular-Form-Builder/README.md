@@ -14,6 +14,6 @@
 - [ ] Add draggable items to add to the table:
   - [X] Text Input
   - [X] Number Input (input but only allow number)
-  - [ ] Date and Time Input
+  - [X] Date and Time Input
   - [ ] Multiple Choice Input
   - [ ] Multimedia Input

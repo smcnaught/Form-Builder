@@ -14,6 +14,13 @@
   (dragstart)="onDragNewItemStart(DraggedElementType.number)"
 />
 
+<br><br>
+
+<div draggable="true" (dragstart)="onDragNewItemStart(DraggedElementType.dateTime)">
+  <input type="date" />
+  <input type="time" />
+</div>
+
 <div *ngFor="let section of allSections; let i = index;">
   <div
     class="section-droppable"
