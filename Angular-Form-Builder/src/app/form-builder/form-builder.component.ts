@@ -47,11 +47,6 @@ export class FormBuilderComponent implements OnInit {
     this.moveSectionInfo.moveToSectionIndex = moveToIndex;
   }
 
-  // TODO can we remove all of these methods? In section comp too
-  public onDragLeave(event: DragEvent): void {
-    // event.preventDefault();
-  }
-
   public onDropSection(): void {
     if (this.moveSectionInfo.moveToSectionIndex < 0) this.moveSectionInfo.moveToSectionIndex = 0; // move to beginning of form
 

@@ -8,7 +8,6 @@
   <div
     class="section-droppable"
     (dragover)="onDragOver($event, i - 1)"
-    (dragend)="onDragLeave($event)"
     (drop)="onDropSection()"
   ></div>
 
@@ -29,7 +28,6 @@
   <div
     class="section-droppable"
     (dragover)="onDragOver($event, i + 1)"
-    (dragend)="onDragLeave($event)"
     (drop)="onDropSection()"
   ></div>
 </div>

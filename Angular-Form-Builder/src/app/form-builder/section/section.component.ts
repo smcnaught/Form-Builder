@@ -70,10 +70,6 @@ export class SectionComponent implements OnInit, OnDestroy {
     this.dragInfo.moveToColumn = columnIndex;
   }
 
-  public onDragLeave(event: DragEvent): void {
-    event.preventDefault();
-  }
-
   public selectItem(item: IItem, column: number, row: number): void {
     this.selectedItemLocation.column = column;
     this.selectedItemLocation.row = row;
