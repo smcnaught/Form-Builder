@@ -1,0 +1,41 @@
+<button draggable="true" (dragstart)="onDragNewItemStart(DraggedElementType.text)">Text</button>
+<br><br>
+<button draggable="true" (dragstart)="onDragNewItemStart(DraggedElementType.number)">Number</button>
+<br><br>
+<button draggable="true" (dragstart)="onDragNewItemStart(DraggedElementType.dateTime)">Date & Time</button>
+
+<div *ngFor="let section of allSections; let i = index;">
+  <div
+    class="section-droppable"
+    (dragover)="onDragOver($event, i - 1)"
+    (dragend)="onDragLeave($event)"
+    (drop)="onDropSection()"
+  ></div>
+
+  <section
+    class="section-border"
+    draggable="true"
+    (dragstart)="onDragSection(i)"
+    [section]="section"
+    [typeOfDraggedElement]="draggedElementType"
+    [itemChangedFromSettings]="selectedItemChanged"
+    [itemMovedFromOtherSection]="itemToAddToOtherSection"
+    (dragBetweenSections)="setDataForDragBetweenSections($event)"
+    (selectedItem)="onSelectedItemChange($event)"
+    (removeFromSectionItemCameFrom)="removeItem($event)"
+    >
+  </section>
+
+  <div
+    class="section-droppable"
+    (dragover)="onDragOver($event, i + 1)"
+    (dragend)="onDragLeave($event)"
+    (drop)="onDropSection()"
+  ></div>
+</div>
+
+<br><br>
+<settings
+  [item]="selectedItem"
+  (updatedItem)="onUpdateSelectedItem($event)">
+</settings>
