@@ -111,7 +111,7 @@ export class FormBuilderComponent implements OnInit {
         data: [
           { 'column0': { name: 'name-pup-count', type: DraggedElementType.number, value: 512 }, 'column1': { name: 'name-bird', type: DraggedElementType.text, value: 'bird' } }, // row 0
           { 'column0': { name: 'name-date-time', type: DraggedElementType.dateTime, value: { date: '2018-07-22', time: '13:30' } }, 'column1': { name: 'name-monkey', type: DraggedElementType.text, value: 'monkey' } }, // row 1
-          { 'column0': { name: 'name-dog', type: DraggedElementType.text, value: 'dog' }, 'column1': { name: 'name-tiger', type: DraggedElementType.text, value: 'tiger' } }, // row 2
+          { 'column0': { name: 'name-dog', type: DraggedElementType.multiSelect, value: [{ value: 'one', checked: false }, { value: 'two', checked: false }, { value: 'three', checked: false }] }, 'column1': { name: 'name-tiger', type: DraggedElementType.text, value: 'tiger' } }, // row 2
         ],
       },
       {

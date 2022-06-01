@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 
-import { IItem } from "../shared/types";
+import { DraggedElementType, IItem } from "../shared/types";
 
 @Component({
   selector: 'settings',
@@ -11,6 +11,10 @@ export class SettingsComponent {
   @Input() item: IItem;
   @Output() updatedItem = new EventEmitter<IItem>();
 
+  public get DraggedElementType() {
+    return DraggedElementType;
+  }
+  
   public updateItem(): void {
     this.updatedItem.emit(this.item);
   }

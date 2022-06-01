@@ -3,6 +3,8 @@
 <button draggable="true" (dragstart)="onDragNewItemStart(DraggedElementType.number)">Number</button>
 <br><br>
 <button draggable="true" (dragstart)="onDragNewItemStart(DraggedElementType.dateTime)">Date & Time</button>
+<br><br>
+<button draggable="true" (dragstart)="onDragNewItemStart(DraggedElementType.multiSelect)">Multi Select</button>
 
 <div *ngFor="let section of allSections; let i = index;">
   <div

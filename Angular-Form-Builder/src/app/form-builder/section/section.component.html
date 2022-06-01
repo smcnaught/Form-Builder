@@ -92,6 +92,39 @@
           </div>
 
           <div
+            *ngIf="element[column].type === draggedElementEnum.multiSelect"
+            class="draggable-element"
+            draggable="true"
+            (dragstart)="onDragStart($event, colIndex, rowIndex)"
+            (click)="selectItem(element[column], colIndex, rowIndex)" 
+            >
+            <span>
+              <label for="multiSelectInput">
+                <input
+                  placeholder="Enter Label"
+                  [(ngModel)]='element[column].name'
+                  (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
+              </label>
+              <div id="multiSelectInput" *ngFor="let item of element[column].value; let i = index;">
+                <input
+                  type="checkbox"
+                  [id]="'item'+i"
+                  [name]="'item'+i"
+                  [(ngModel)]='item.checked'
+                  (ngModelChange)="selectItem(element[column], colIndex, rowIndex)">
+
+                <label [for]="'item'+i">
+                  <input
+                    placeholder="Enter Option"
+                    [(ngModel)]='item.value'
+                    (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
+                </label><br>
+              </div>
+              <button (click)="addItemToSelect(rowIndex, colIndex)">Add Option</button>
+            </span>
+          </div>
+
+          <div
             class="right-droppable"
             (dragover)="onDragOver($event, rowIndex, colIndex + 1)"
             (drop)="onDrop()"

@@ -58,5 +58,6 @@ export enum DraggedElementType {
   none,
   text,
   number,
-  dateTime
+  dateTime,
+  multiSelect
 }

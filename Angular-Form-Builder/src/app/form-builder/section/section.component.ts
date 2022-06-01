@@ -76,6 +76,10 @@ export class SectionComponent implements OnInit, OnDestroy {
     this.selectedItem.emit(item);
   }
 
+  public addItemToSelect(row: number, column: number): void {
+    this.sectionData[row]['column'+column].value.push({ value: '', checked: false });
+  }
+
   private removeItem(removeInfo: IRemoveItem): void {
     if (this.sectionSettings.id === removeInfo.sectionID) {
       this.sectionData[removeInfo.row]['column'+removeInfo.column] = { name: '', type: DraggedElementType.none, value: '' };
@@ -90,7 +94,7 @@ export class SectionComponent implements OnInit, OnDestroy {
     const moveItemToAfterLastRow = this.dragInfo.moveToRow === this.sectionData.length;
     const switchTwoItemsInSameColumn = this.dragInfo.draggedItemColumn === this.dragInfo.moveToColumn;
     const switchTwoItemsInSameRow = this.dragInfo.draggedItemRow === this.dragInfo.moveToRow;
-    const movingToEmptySpace = this.sectionData[this.dragInfo.moveToRow]['column'+this.dragInfo.moveToColumn].type === DraggedElementType.none;
+    const movingToEmptySpace = this.sectionData[this.dragInfo.moveToRow] !== undefined && this.sectionData[this.dragInfo.moveToRow]['column'+this.dragInfo.moveToColumn].type === DraggedElementType.none;
 
     if (moveItemToAfterLastRow) {
       const dataToMove: IItem = this.sectionData[this.dragInfo.draggedItemRow]['column'+this.dragInfo.draggedItemColumn];
@@ -163,6 +167,9 @@ export class SectionComponent implements OnInit, OnDestroy {
     }
     else if (this.typeOfDraggedElement === DraggedElementType.dateTime) {
       newItem = { type: this.typeOfDraggedElement, value: { date: '', time: '' }, name: '' }
+    }
+    else if (this.typeOfDraggedElement === DraggedElementType.multiSelect) {
+      newItem = { type: this.typeOfDraggedElement, value: [], name: '' }
     }
 
     if (rowAlreadyExists) {
