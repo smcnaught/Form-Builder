@@ -87,9 +87,12 @@ export class SectionComponent implements OnInit, OnDestroy {
     const draggingDown: boolean = this.dragInfo.draggedItemRow < this.dragInfo.moveToRow;
 
     if (movingWithinColumn && draggingDown) this.dragInfo.moveToRow--;
+    const moveItemToAfterLastRow = this.dragInfo.moveToRow === this.sectionData.length;
+    const switchTwoItemsInSameColumn = this.dragInfo.draggedItemColumn === this.dragInfo.moveToColumn;
+    const switchTwoItemsInSameRow = this.dragInfo.draggedItemRow === this.dragInfo.moveToRow;
+    const movingToEmptySpace = this.sectionData[this.dragInfo.moveToRow]['column'+this.dragInfo.moveToColumn].type === DraggedElementType.none;
 
-    // add new row
-    if (this.dragInfo.moveToRow === this.sectionData.length) {
+    if (moveItemToAfterLastRow) {
       const dataToMove: IItem = this.sectionData[this.dragInfo.draggedItemRow]['column'+this.dragInfo.draggedItemColumn];
       const newRowInfo: INewRow = {
         totalColumns: this.displayedColumns.length,
@@ -105,7 +108,7 @@ export class SectionComponent implements OnInit, OnDestroy {
 
       this.addRow(newRowInfo, removeInfo);
     }
-    else if (this.dragInfo.draggedItemColumn === this.dragInfo.moveToColumn) {
+    else if (switchTwoItemsInSameColumn || switchTwoItemsInSameRow || movingToEmptySpace) {
       const switchItem1: ISwitchInfo = {
         column: this.dragInfo.moveToColumn,
         row: this.dragInfo.moveToRow
@@ -116,7 +119,7 @@ export class SectionComponent implements OnInit, OnDestroy {
         row: this.dragInfo.draggedItemRow,
       }
 
-      this.switchItemsInColumn(switchItem1, switchItem2);
+      this.switchTwoItems(switchItem1, switchItem2);
     }
     else {
       let removeInfo: IRemoveItem = {
@@ -188,7 +191,8 @@ export class SectionComponent implements OnInit, OnDestroy {
     this.table.renderRows();
   }
 
-  private switchItemsInColumn(item1Position: ISwitchInfo, item2Position: ISwitchInfo): void {
+  // Used to switch two items that are either in the same column or in the same row.
+  private switchTwoItems(item1Position: ISwitchInfo, item2Position: ISwitchInfo): void {
     const newItem1 = this.sectionData[item2Position.row]['column'+item2Position.column];
     const newItem2 = this.sectionData[item1Position.row]['column'+item1Position.column];
 

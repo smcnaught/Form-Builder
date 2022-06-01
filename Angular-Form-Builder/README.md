@@ -11,6 +11,7 @@
 - [ ] Visually show the area we're dragging over
 - [X] Should have settings for each item. 
 - [ ] Should be able to change the width of an item using settings pane. 
+- [ ] Moving to the side of the first/last column should add a new column. 
 - [ ] Add draggable items to add to the table:
   - [X] Text Input
   - [X] Number Input (input but only allow number)
