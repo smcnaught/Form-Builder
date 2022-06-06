@@ -118,7 +118,25 @@
                     placeholder="Enter Option"
                     [(ngModel)]='item.value'
                     (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
-                    <mat-icon (click)="removeSelectItem(rowIndex, colIndex, i)">remove</mat-icon>
+
+                    <button mat-icon-button [matMenuTriggerFor]="menu">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #menu="matMenu">
+                      <button mat-menu-item [disabled]="i === 0" (click)="moveSelectedItemUp(rowIndex, colIndex, i)">
+                        <mat-icon>move_up</mat-icon>
+                        <span>Move Up</span>
+                      </button>
+                      <button mat-menu-item [disabled]="i === element[column].value.length - 1" (click)="moveSelectedItemDown(rowIndex, colIndex, i)">
+                        <mat-icon>move_down</mat-icon>
+                        <span>Move Down</span>
+                      </button>
+                      <button mat-menu-item (click)="removeSelectItem(rowIndex, colIndex, i)">
+                        <mat-icon>delete</mat-icon>
+                        <span>Delete</span>
+                      </button>
+                    </mat-menu>
+
                 </label><br>
               </div>
               <div><button (click)="addItemToSelect(rowIndex, colIndex)">Add Option</button></div>
@@ -148,7 +166,25 @@
                     (change)="changeSelectSingleItem(i, element[column], colIndex, rowIndex)">
                     <input [(ngModel)]="item.value">
                   </mat-radio-button>
-                  <mat-icon (click)="removeSelectItem(rowIndex, colIndex, i)">remove</mat-icon>
+
+                  <button mat-icon-button [matMenuTriggerFor]="menu">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #menu="matMenu">
+                    <button mat-menu-item [disabled]="i === 0" (click)="moveSelectedItemUp(rowIndex, colIndex, i)">
+                      <mat-icon>move_up</mat-icon>
+                      <span>Move Up</span>
+                    </button>
+                    <button mat-menu-item [disabled]="i === element[column].value.length - 1" (click)="moveSelectedItemDown(rowIndex, colIndex, i)">
+                      <mat-icon>move_down</mat-icon>
+                      <span>Move Down</span>
+                    </button>
+                    <button mat-menu-item (click)="removeSelectItem(rowIndex, colIndex, i)">
+                      <mat-icon>delete</mat-icon>
+                      <span>Delete</span>
+                    </button>
+                  </mat-menu>
+
                 </div>
               </mat-radio-group>
 

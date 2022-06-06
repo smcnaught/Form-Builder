@@ -90,6 +90,16 @@ export class SectionComponent implements OnInit, OnDestroy {
     this.sectionData[row]['column'+column].value.splice(selectItemIndex, 1);
   }
 
+  public moveSelectedItemUp(row: number, column: number, movingFrom: number): void {
+    const itemMoving = this.sectionData[row]['column'+column].value.splice(movingFrom, 1)[0];
+    this.sectionData[row]['column'+column].value.splice(movingFrom - 1, 0, itemMoving);
+  }
+
+  public moveSelectedItemDown(row: number, column: number, movingFrom: number): void {
+    const itemMoving = this.sectionData[row]['column'+column].value.splice(movingFrom, 1)[0];
+    this.sectionData[row]['column'+column].value.splice(movingFrom + 1, 0, itemMoving);
+  }
+
   private removeItem(removeInfo: IRemoveItem): void {
     if (this.sectionSettings.id === removeInfo.sectionID) {
       this.sectionData[removeInfo.row]['column'+removeInfo.column] = { name: '', type: DraggedElementType.none, value: '' };
