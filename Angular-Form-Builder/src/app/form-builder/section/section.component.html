@@ -118,6 +118,7 @@
                     placeholder="Enter Option"
                     [(ngModel)]='item.value'
                     (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
+                    <mat-icon (click)="removeSelectItem(rowIndex, colIndex, i)">remove</mat-icon>
                 </label><br>
               </div>
               <div><button (click)="addItemToSelect(rowIndex, colIndex)">Add Option</button></div>
@@ -147,6 +148,7 @@
                     (change)="changeSelectSingleItem(i, element[column], colIndex, rowIndex)">
                     <input [(ngModel)]="item.value">
                   </mat-radio-button>
+                  <mat-icon (click)="removeSelectItem(rowIndex, colIndex, i)">remove</mat-icon>
                 </div>
               </mat-radio-group>
 

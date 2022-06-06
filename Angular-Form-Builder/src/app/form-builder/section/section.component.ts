@@ -86,6 +86,10 @@ export class SectionComponent implements OnInit, OnDestroy {
     this.sectionData[row]['column'+column].value.push({ value: '', checked: false });
   }
 
+  public removeSelectItem(row: number, column: number, selectItemIndex: number): void {
+    this.sectionData[row]['column'+column].value.splice(selectItemIndex, 1);
+  }
+
   private removeItem(removeInfo: IRemoveItem): void {
     if (this.sectionSettings.id === removeInfo.sectionID) {
       this.sectionData[removeInfo.row]['column'+removeInfo.column] = { name: '', type: DraggedElementType.none, value: '' };

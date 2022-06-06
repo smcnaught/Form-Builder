@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
 
 import { FormBuilderComponent } from './form-builder.component';
 import { SectionComponent } from './section/section.component';
@@ -24,7 +25,8 @@ import { SettingsComponent } from './settings/settings.component';
     MatTableModule,
     MatRadioModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    MatIconModule
   ],
   exports: [FormBuilderComponent],
   providers: [],
