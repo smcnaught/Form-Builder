@@ -12,7 +12,7 @@
     </span>
   </div>
 
-  <div *ngIf="item.type !== DraggedElementType.dateTime && item.type !== DraggedElementType.multiSelect">
+  <div *ngIf="item.type !== DraggedElementType.dateTime && item.type !== DraggedElementType.multiSelect && item.type !== DraggedElementType.singleSelect">
     <span>Item Value: </span>
     <span>
       <input

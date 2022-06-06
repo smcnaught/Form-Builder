@@ -120,7 +120,37 @@
                     (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
                 </label><br>
               </div>
-              <button (click)="addItemToSelect(rowIndex, colIndex)">Add Option</button>
+              <div><button (click)="addItemToSelect(rowIndex, colIndex)">Add Option</button></div>
+            </span>
+          </div>
+
+          <div
+            *ngIf="element[column].type === draggedElementEnum.singleSelect"
+            class="draggable-element"
+            draggable="true"
+            (dragstart)="onDragStart($event, colIndex, rowIndex)"
+            (click)="selectItem(element[column], colIndex, rowIndex)" 
+            >
+            <span>
+              <mat-label>
+                <input
+                  placeholder="Enter Label"
+                  [(ngModel)]='element[column].name'
+                  (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
+              </mat-label>
+            
+              <mat-radio-group>
+                <div *ngFor="let item of element[column].value; let i = index;">
+                  <mat-radio-button
+                    [value]="item.checked"
+                    [checked]="item.checked"
+                    (change)="changeSelectSingleItem(i, element[column], colIndex, rowIndex)">
+                    <input [(ngModel)]="item.value">
+                  </mat-radio-button>
+                </div>
+              </mat-radio-group>
+
+              <div><button (click)="addItemToSelect(rowIndex, colIndex)">Add Option</button></div>
             </span>
           </div>
 

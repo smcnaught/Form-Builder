@@ -70,6 +70,12 @@ export class SectionComponent implements OnInit, OnDestroy {
     this.dragInfo.moveToColumn = columnIndex;
   }
 
+  public changeSelectSingleItem(selectItemIndex: number, item: IItem, column: number, row: number): void {
+    this.sectionData[row]['column' + column].value.forEach((selectItem: any) => selectItem.checked = false);
+    this.sectionData[row]['column' + column].value[selectItemIndex].checked = true;
+    this.selectItem(item, column, row);
+  }
+
   public selectItem(item: IItem, column: number, row: number): void {
     this.selectedItemLocation.column = column;
     this.selectedItemLocation.row = row;
@@ -168,7 +174,7 @@ export class SectionComponent implements OnInit, OnDestroy {
     else if (this.typeOfDraggedElement === DraggedElementType.dateTime) {
       newItem = { type: this.typeOfDraggedElement, value: { date: '', time: '' }, name: '' }
     }
-    else if (this.typeOfDraggedElement === DraggedElementType.multiSelect) {
+    else if (this.typeOfDraggedElement === DraggedElementType.multiSelect || this.typeOfDraggedElement === DraggedElementType.singleSelect) {
       newItem = { type: this.typeOfDraggedElement, value: [], name: '' }
     }
 
