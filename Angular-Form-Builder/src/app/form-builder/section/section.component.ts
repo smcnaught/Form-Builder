@@ -2,7 +2,19 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } 
 import { MatTable } from '@angular/material/table';
 import { Subject, Subscription } from 'rxjs';
 
-import { DraggedElementType, INewRow, IRemoveItem, ISwitchInfo, IAddItem, IItem, ISectionSettings, IDragInfo, IDragBetweenSectionsData, ISectionData, ISection } from '../shared/types';
+import {
+  DraggedElementType,
+  INewRow,
+  IRemoveItem,
+  ISwitchInfo,
+  IAddItem,
+  IItem,
+  ISectionSettings,
+  IDragInfo,
+  IDragBetweenSectionsData,
+  ISectionData,
+  ISection,
+  FormItems } from '../shared/types';
 
 @Component({
   selector: 'section',
@@ -77,7 +89,7 @@ export class SectionComponent implements OnInit, OnDestroy {
   }
 
   public changeSelectSingleItem(selectItemIndex: number, item: IItem, column: number, row: number): void {
-    this.sectionData[row]['column' + column].value.forEach((selectItem: any) => selectItem.checked = false);
+    (<FormItems.ISelectInput[]>this.sectionData[row]['column' + column].value).forEach((selectItem: FormItems.ISelectInput) => selectItem.checked = false);
     this.sectionData[row]['column' + column].value[selectItemIndex].checked = true;
     this.selectItem(item, column, row);
   }
@@ -89,21 +101,21 @@ export class SectionComponent implements OnInit, OnDestroy {
   }
 
   public addItemToSelect(row: number, column: number): void {
-    this.sectionData[row]['column'+column].value.push({ value: '', checked: false });
+    (<FormItems.ISelectInput[]>this.sectionData[row]['column'+column].value).push({ value: '', checked: false });
   }
 
   public removeSelectItem(row: number, column: number, selectItemIndex: number): void {
-    this.sectionData[row]['column'+column].value.splice(selectItemIndex, 1);
+    (<FormItems.ISelectInput[]>this.sectionData[row]['column'+column].value).splice(selectItemIndex, 1);
   }
 
   public moveSelectedItemUp(row: number, column: number, movingFrom: number): void {
-    const itemMoving = this.sectionData[row]['column'+column].value.splice(movingFrom, 1)[0];
-    this.sectionData[row]['column'+column].value.splice(movingFrom - 1, 0, itemMoving);
+    const itemMoving = (<FormItems.ISelectInput[]>this.sectionData[row]['column'+column].value).splice(movingFrom, 1)[0];
+    (<FormItems.ISelectInput[]>this.sectionData[row]['column'+column].value).splice(movingFrom - 1, 0, itemMoving);
   }
 
   public moveSelectedItemDown(row: number, column: number, movingFrom: number): void {
-    const itemMoving = this.sectionData[row]['column'+column].value.splice(movingFrom, 1)[0];
-    this.sectionData[row]['column'+column].value.splice(movingFrom + 1, 0, itemMoving);
+    const itemMoving = (<FormItems.ISelectInput[]>this.sectionData[row]['column'+column].value).splice(movingFrom, 1)[0];
+    (<FormItems.ISelectInput[]>this.sectionData[row]['column'+column].value).splice(movingFrom + 1, 0, itemMoving);
   }
 
   private removeItem(removeInfo: IRemoveItem): void {
@@ -172,7 +184,7 @@ export class SectionComponent implements OnInit, OnDestroy {
       this.sectionData[this.dragInfo.moveToRow]['column'+ this.dragInfo.moveToColumn] = this.itemMovedFromOtherSection;
     }
     else {
-      let newRow = {};
+      let newRow: ISectionData = {};
       this.displayedColumns.forEach((column: string) => {
         newRow[column] = { type: DraggedElementType.none, value: '', name: '' }
       })
@@ -202,9 +214,9 @@ export class SectionComponent implements OnInit, OnDestroy {
       this.sectionData[this.dragInfo.moveToRow]['column'+ this.dragInfo.moveToColumn] = newItem;
     }
     else if (movingToNewRow) {
-      let newRow = {};
-      this.displayedColumns.forEach((col) => {
-        newRow[col] = { type: DraggedElementType.none, value: '', name: '' }
+      let newRow: ISectionData = {};
+      this.displayedColumns.forEach((columnName: string) => {
+        newRow[columnName] = { type: DraggedElementType.none, value: '', name: '' }
       })
 
       newRow['column' + this.dragInfo.moveToColumn] = newItem;
@@ -220,12 +232,12 @@ export class SectionComponent implements OnInit, OnDestroy {
 
   private addColumn(addingToFarLeft: boolean, addingToFarRight: boolean, insertNewAt?: number): void {
     if (insertNewAt) {
-      let newColumnNumber;
-      let newSectionData = [];
+      let newColumnNumber: number;
+      let newSectionData: ISectionData[] = [];
       for (let i = 0; i < this.sectionData.length; i++) {
-        const newRow = {};
+        const newRow: ISectionData = {};
 
-        Object.keys(this.sectionData[i]).forEach((column: any /**TODO */) => {
+        Object.keys(this.sectionData[i]).forEach((column: string) => {
           const columnNumber = +column.substring(6);
           newColumnNumber = columnNumber + 1;
           if (columnNumber < insertNewAt) newRow[column] = this.sectionData[i][column];
@@ -240,12 +252,12 @@ export class SectionComponent implements OnInit, OnDestroy {
       this.displayedColumns.push('column'+newColumnNumber);
     }
     else if (addingToFarLeft) {
-      let newColumnNumber;
-      let newSectionData = [];
+      let newColumnNumber: number;
+      let newSectionData: ISectionData[] = [];
       for (let i = 0; i < this.sectionData.length; i++) {
-        const newRow = {};
+        const newRow: ISectionData = {};
 
-        Object.keys(this.sectionData[i]).forEach((column: any /**TODO */) => {
+        Object.keys(this.sectionData[i]).forEach((column: string) => {
           newColumnNumber = +column.substring(6) + 1;
           newRow['column'+newColumnNumber] = this.sectionData[i][column];
         })
@@ -273,8 +285,8 @@ export class SectionComponent implements OnInit, OnDestroy {
 
   // Used to switch two items that are either in the same column or in the same row.
   private switchTwoItems(item1Position: ISwitchInfo, item2Position: ISwitchInfo): void {
-    const newItem1 = this.sectionData[item2Position.row]['column'+item2Position.column];
-    const newItem2 = this.sectionData[item1Position.row]['column'+item1Position.column];
+    const newItem1: IItem = this.sectionData[item2Position.row]['column'+item2Position.column];
+    const newItem2: IItem = this.sectionData[item1Position.row]['column'+item1Position.column];
 
     this.sectionData[item1Position.row]['column'+item1Position.column] = newItem1;
     this.sectionData[item2Position.row]['column'+item2Position.column] = newItem2;
@@ -282,8 +294,8 @@ export class SectionComponent implements OnInit, OnDestroy {
   }
 
   private moveBetweenColumns(removeInfo: IRemoveItem, addInfo: IAddItem): void {
-    let itemToMove;
-    let itemReplacing = this.sectionData[removeInfo.row]['column'+removeInfo.column];
+    let itemToMove: IItem;
+    let itemReplacing: IItem = this.sectionData[removeInfo.row]['column'+removeInfo.column];
     this.removeItem(removeInfo);
     
     const changingColumn: string = 'column'+addInfo.column;
@@ -304,10 +316,10 @@ export class SectionComponent implements OnInit, OnDestroy {
   }
 
   private addRow(newRowInfo: INewRow, removeInfo?: IRemoveItem): void {
-    let row: any = {};
+    let row: ISectionData = {};
     for (let i = 0; i < newRowInfo.totalColumns; i++) {
       if (i === newRowInfo.columnWithData) row['column'+i] = newRowInfo.columnData;
-      else row['column'+i] = { type: DraggedElementType.none, value: null };
+      else row['column'+i] = { type: DraggedElementType.none, value: null, name: null };
     }
 
     this.sectionData.push(row);
@@ -317,7 +329,7 @@ export class SectionComponent implements OnInit, OnDestroy {
 
   private checkDeleteEmptyRows(): void {
     for (let i = 0; i < this.sectionData.length; i++) {
-      const row = this.sectionData[i];
+      const row: ISectionData = this.sectionData[i];
 
       for (let j = 0; j < this.displayedColumns.length; j++) {
         if (row['column'+j].type !== DraggedElementType.none) break;
@@ -332,7 +344,7 @@ export class SectionComponent implements OnInit, OnDestroy {
   }
 
   private checkDeleteEmptyColumns(): void {
-    let columnsToKeep = [];
+    let columnsToKeep: string[] = [];
 
     for (let i = 0; i < this.displayedColumns.length; i++) {
       for (let j = 0; j < this.sectionData.length; j++) {

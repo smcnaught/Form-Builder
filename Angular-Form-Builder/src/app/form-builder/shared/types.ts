@@ -1,7 +1,7 @@
 export interface IItem {
   name: string;
   type: DraggedElementType,
-  value: any;
+  value: FormItems.TextInput | FormItems.NumberInput |  FormItems.IDateTimeInput | FormItems.ISelectInput[];
 }
 
 export interface IRemoveItem {
@@ -45,6 +45,21 @@ export interface ISectionSettings {
 
 export interface ISectionData {
   [column: string]: IItem 
+}
+
+export namespace FormItems {
+  export type TextInput = string;
+  export type NumberInput = number;
+
+  export interface IDateTimeInput {
+    date: string;
+    time: string;
+  }
+
+  export interface ISelectInput {
+    value: string;
+    checked: boolean;
+  }
 }
 
 export interface IDragBetweenSectionsData {
