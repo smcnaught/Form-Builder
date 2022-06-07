@@ -7,7 +7,7 @@
 - [X] Moving to the side of the first/last column should add a new column.
 - [X] Moving to the side of a column in the middle should add the data to a new column in the middle.
 - [X] Add types/interfaces to all the draggable items. 
-- [ ] Fix Item Settings for date time and multi select
+- [X] Fix Item Settings for date time and multi select
 - [ ] 
 - [ ] Ability to move entire column or row - do we want this? 
 - [X] Implement multiple sections

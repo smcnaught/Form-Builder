@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 
+import { IItemUpdatedFromSettingsInfo } from './settings/settings.component';
 import { DraggedElementType, IDragBetweenSectionsData, IItem, ISection } from './shared/types';
 
 @Component({
@@ -10,7 +11,7 @@ import { DraggedElementType, IDragBetweenSectionsData, IItem, ISection } from '.
 })
 export class FormBuilderComponent implements OnInit {
   public selectedItem: IItem;
-  public selectedItemChanged: Subject<IItem> = new Subject();
+  public selectedItemChanged: Subject<IItemUpdatedFromSettingsInfo> = new Subject();
   public allSections: Array<ISection>;
   public itemToAddToOtherSection: IItem = null; // needs to be set to null
   public draggedElementType: DraggedElementType;
@@ -26,8 +27,8 @@ export class FormBuilderComponent implements OnInit {
     this.selectedItem = item;
   }
 
-  public onUpdateSelectedItem(item: IItem): void {
-    this.selectedItemChanged.next(item);
+  public onUpdateSelectedItem(itemInfo: IItemUpdatedFromSettingsInfo): void {
+    this.selectedItemChanged.next(itemInfo);
   }
 
   public get DraggedElementType() {

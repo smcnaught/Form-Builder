@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } 
 import { MatTable } from '@angular/material/table';
 import { Subject, Subscription } from 'rxjs';
 
+import { IItemUpdatedFromSettingsInfo } from '../settings/settings.component';
 import {
   DraggedElementType,
   INewRow,
@@ -25,7 +26,7 @@ export class SectionComponent implements OnInit, OnDestroy {
   @ViewChild(MatTable) table: MatTable<ISectionData>;
   @Input() section: ISection;
   @Input() typeOfDraggedElement: DraggedElementType;
-  @Input() itemChangedFromSettings: Subject<IItem>;
+  @Input() itemChangedFromSettings: Subject<IItemUpdatedFromSettingsInfo>;
   @Input() itemMovedFromOtherSection: IItem = null; // needs to be set to null
   @Output() dragBetweenSections = new EventEmitter<IDragBetweenSectionsData>();
   @Output() selectedItem = new EventEmitter<IItem>();
@@ -360,8 +361,10 @@ export class SectionComponent implements OnInit, OnDestroy {
   }
 
   private updateItem(updatedItem: IItem): void {
-    this.sectionData[this.selectedItemLocation.column][this.selectedItemLocation.row] = updatedItem;
-    this.table.renderRows();
+    if (this.selectedItemLocation.row && this.selectedItemLocation.column) {
+      this.sectionData[this.selectedItemLocation.row]['column'+this.selectedItemLocation.column] = updatedItem;
+      this.table.renderRows();
+    }
   }
 
   private setupPage(): void {
@@ -380,8 +383,11 @@ export class SectionComponent implements OnInit, OnDestroy {
   }
 
   private setupSettingsListener(): void {
-    const settingsSub = this.itemChangedFromSettings.subscribe((updatedItem: IItem) => {
-      this.updateItem(updatedItem)
+    const settingsSub = this.itemChangedFromSettings.subscribe((updatedItemInfo: IItemUpdatedFromSettingsInfo) => {
+      if (updatedItemInfo.isSingleSelect && this.selectedItemLocation.column && this.selectedItemLocation.row) {
+        this.changeSelectSingleItem(updatedItemInfo.singleSelectIndex, updatedItemInfo.item, this.selectedItemLocation.column, this.selectedItemLocation.row);
+      }
+      this.updateItem(updatedItemInfo.item)
     })
 
     this.subscriptions.add(settingsSub);

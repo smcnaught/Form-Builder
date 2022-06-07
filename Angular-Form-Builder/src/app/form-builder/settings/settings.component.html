@@ -23,4 +23,55 @@
     </span>
   </div>
 
+  <div *ngIf="item.type === DraggedElementType.dateTime">
+    <span>Date: </span>
+    <span>
+      <input
+        type='date'
+        [(ngModel)]='$any(item.value).date'
+        (ngModelChange)="updateItem()" />
+    </span>
+
+    <div>
+      <span>Time: </span>
+      <input
+        type="time" 
+        [(ngModel)]='$any(item.value).time'
+        (ngModelChange)="updateItem()" />
+    </div>
+  </div>
+
+  <div *ngIf="item.type === DraggedElementType.multiSelect">
+    <span>Options: </span>
+    <div *ngFor="let option of $any(item.value)">
+      <span>
+        <input
+          type='checkbox'
+          [(ngModel)]='option.checked'
+          (ngModelChange)="updateItem()" />
+
+          <input
+            placeholder="Enter Option"
+            [(ngModel)]='option.value'
+            (ngModelChange)="updateItem()" />
+      </span>
+
+    </div>
+  </div>
+
+  <div *ngIf="item.type === DraggedElementType.singleSelect">
+    <span>Options: </span>
+    <div *ngFor="let option of $any(item.value); let i = index;">
+      <span>
+        <mat-radio-button
+          [value]="option.checked"
+          [checked]="option.checked"
+          (change)="updateItem(true, i)">
+          <input [(ngModel)]="option.value" (ngModelChange)="updateItem()" />
+        </mat-radio-button>
+      </span>
+
+    </div>
+  </div>
+
 </div>
