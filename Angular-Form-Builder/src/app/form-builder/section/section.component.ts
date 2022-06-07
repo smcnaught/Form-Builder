@@ -38,15 +38,21 @@ export class SectionComponent implements OnInit, OnDestroy {
 
   public get draggedElementEnum() { return DraggedElementType };
 
-  public onDrop(movingToExistingRow?: boolean): void {
+  public onDrop(movingToRow: boolean, movingToEmptySpace?: boolean): void {
     const movingItemFromThisSection = this.dragInfo.draggedItemColumn !== null && this.dragInfo.draggedItemColumn !== null;
     const movingFromDifferentSection = !movingItemFromThisSection && this.itemMovedFromOtherSection !== null;
+    const addingNewColumn = !this.displayedColumns.includes('column'+this.dragInfo.moveToColumn);
+    if (addingNewColumn) {
+      const addingToLeft = this.dragInfo.moveToColumn === -1;
+      this.addColumn(addingToLeft, !addingToLeft);
+    }
 
     if (movingItemFromThisSection) this.moveExistingItem();
-    else if (movingFromDifferentSection) this.addItemFromOtherSection(movingToExistingRow);
-    else this.addNewItem(movingToExistingRow);
+    else if (movingFromDifferentSection) this.addItemFromOtherSection(movingToEmptySpace);
+    else this.addNewItem(movingToEmptySpace, movingToRow, addingNewColumn);
     this.resetDragInfo();
-    this.checkDeleteEmptyRows(this.displayedColumns.length);
+    this.checkDeleteEmptyRows();
+    this.checkDeleteEmptyColumns();
   }
 
   public onDragStart(event: DragEvent, columnIndex: number, rowIndex: number): void {
@@ -161,8 +167,8 @@ export class SectionComponent implements OnInit, OnDestroy {
     }
   }
 
-  private addItemFromOtherSection(rowAlreadyExists: boolean): void {
-    if (rowAlreadyExists) {
+  private addItemFromOtherSection(movingToEmptySpace: boolean): void {
+    if (movingToEmptySpace) {
       this.sectionData[this.dragInfo.moveToRow]['column'+ this.dragInfo.moveToColumn] = this.itemMovedFromOtherSection;
     }
     else {
@@ -180,7 +186,7 @@ export class SectionComponent implements OnInit, OnDestroy {
     this.table.renderRows();
   }
 
-  private addNewItem(rowAlreadyExists: boolean): void {
+  private addNewItem(movingToEmptySpace: boolean, movingToNewRow: boolean, columnAlreadyAdded: boolean): void {
     let newItem: IItem;
     if (this.typeOfDraggedElement === DraggedElementType.text || this.typeOfDraggedElement === DraggedElementType.number) {
       newItem = { type: this.typeOfDraggedElement, value: '', name: '' }
@@ -192,10 +198,10 @@ export class SectionComponent implements OnInit, OnDestroy {
       newItem = { type: this.typeOfDraggedElement, value: [], name: '' }
     }
 
-    if (rowAlreadyExists) {
+    if (movingToEmptySpace) {
       this.sectionData[this.dragInfo.moveToRow]['column'+ this.dragInfo.moveToColumn] = newItem;
     }
-    else {
+    else if (movingToNewRow) {
       let newRow = {};
       this.displayedColumns.forEach((col) => {
         newRow[col] = { type: DraggedElementType.none, value: '', name: '' }
@@ -204,17 +210,64 @@ export class SectionComponent implements OnInit, OnDestroy {
       newRow['column' + this.dragInfo.moveToColumn] = newItem;
       this.sectionData.splice(this.dragInfo.moveToRow, 0, newRow);
     }
+    else { // moving to new column in between other columns
+      if (!columnAlreadyAdded) this.addColumn(false, false, this.dragInfo.moveToColumn);
+      this.sectionData[this.dragInfo.moveToRow]['column'+this.dragInfo.moveToColumn] = newItem;
+    }
 
     this.table.renderRows();
   }
 
-  private addColumn(columnID: number): void {
-    const columnName: string = 'column' + columnID;
-    this.sectionData.forEach((row) => {
-      row[columnName] = { name: '', type: DraggedElementType.none, value: '' };
-    })
+  private addColumn(addingToFarLeft: boolean, addingToFarRight: boolean, insertNewAt?: number): void {
+    if (insertNewAt) {
+      let newColumnNumber;
+      let newSectionData = [];
+      for (let i = 0; i < this.sectionData.length; i++) {
+        const newRow = {};
 
-    this.displayedColumns.push(columnName);
+        Object.keys(this.sectionData[i]).forEach((column: any /**TODO */) => {
+          const columnNumber = +column.substring(6);
+          newColumnNumber = columnNumber + 1;
+          if (columnNumber < insertNewAt) newRow[column] = this.sectionData[i][column];
+          else if (columnNumber >= insertNewAt) newRow['column'+ newColumnNumber] = this.sectionData[i][column];
+        })
+
+        newRow['column'+insertNewAt] = { type: DraggedElementType.none, value: '', name: '' };
+        newSectionData.push(newRow);
+      }
+      
+      this.sectionData = JSON.parse(JSON.stringify(newSectionData));
+      this.displayedColumns.push('column'+newColumnNumber);
+    }
+    else if (addingToFarLeft) {
+      let newColumnNumber;
+      let newSectionData = [];
+      for (let i = 0; i < this.sectionData.length; i++) {
+        const newRow = {};
+
+        Object.keys(this.sectionData[i]).forEach((column: any /**TODO */) => {
+          newColumnNumber = +column.substring(6) + 1;
+          newRow['column'+newColumnNumber] = this.sectionData[i][column];
+        })
+        
+        newRow['column0'] = { name: '', type: DraggedElementType.none, value: '' };
+        newSectionData.push(newRow);
+      }
+
+      this.sectionData = JSON.parse(JSON.stringify(newSectionData));
+      this.displayedColumns.push('column'+newColumnNumber);
+      this.dragInfo.draggedItemColumn++;
+      this.dragInfo.moveToColumn++;
+    }
+    else if (addingToFarRight) {
+      const columnName: string = 'column' + this.dragInfo.moveToColumn;
+      this.sectionData.forEach((row: ISectionData) => {
+        row[columnName] = { name: '', type: DraggedElementType.none, value: '' };
+      })
+  
+      this.displayedColumns.push(columnName);
+    }
+
     this.table.renderRows();
   }
 
@@ -262,19 +315,35 @@ export class SectionComponent implements OnInit, OnDestroy {
     this.table.renderRows();
   }
 
-  private checkDeleteEmptyRows(columnCount: number): void {
+  private checkDeleteEmptyRows(): void {
     for (let i = 0; i < this.sectionData.length; i++) {
       const row = this.sectionData[i];
 
-      for (let j = 0; j < columnCount; j++) {
+      for (let j = 0; j < this.displayedColumns.length; j++) {
         if (row['column'+j].type !== DraggedElementType.none) break;
-        if (j === columnCount - 1) {
+        if (j === this.displayedColumns.length - 1) {
           this.sectionData.splice(i, 1);
-          this.checkDeleteEmptyRows(this.displayedColumns.length);
+          this.checkDeleteEmptyRows();
         }
       }
     }
 
+    this.table.renderRows();
+  }
+
+  private checkDeleteEmptyColumns(): void {
+    let columnsToKeep = [];
+
+    for (let i = 0; i < this.displayedColumns.length; i++) {
+      for (let j = 0; j < this.sectionData.length; j++) {
+        const row = this.sectionData[j];
+        if (row[this.displayedColumns[i]].type !== DraggedElementType.none) {
+          columnsToKeep.push(this.displayedColumns[i]);
+        }
+      }
+    }
+
+    this.displayedColumns = [...new Set(columnsToKeep)];
     this.table.renderRows();
   }
 

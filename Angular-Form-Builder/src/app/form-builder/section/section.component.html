@@ -8,14 +8,14 @@
         <div
           class="above-droppable"
           (dragover)="onDragOver($event, rowIndex, colIndex)"
-          (drop)="onDrop()"
+          (drop)="onDrop(true)"
         ></div>
 
         <div>
           <div
             class="left-droppable"
-            (dragover)="onDragOver($event, rowIndex, colIndex - 1 > 0 ? colIndex : 0)"
-            (drop)="onDrop()"
+            (dragover)="onDragOver($event, rowIndex, colIndex - 1)"
+            (drop)="onDrop(false)"
           ></div>
 
           <div
@@ -195,7 +195,7 @@
           <div
             class="right-droppable"
             (dragover)="onDragOver($event, rowIndex, colIndex + 1)"
-            (drop)="onDrop()"
+            (drop)="onDrop(false)"
           ></div>
 
         </div>
@@ -203,14 +203,14 @@
         <div
           class="below-droppable"
           (dragover)="onDragOver($event, rowIndex + 1, colIndex)"
-          (drop)="onDrop()"
+          (drop)="onDrop(true)"
         ></div>
       </div>
 
       <div *ngIf="element[column].type === draggedElementEnum.none"
         class="all-droppable"
         (dragover)="onDragOver($event, rowIndex, colIndex)"
-        (drop)="onDrop(true)"
+        (drop)="onDrop(false, true)"
       ></div>
 
     </td>
