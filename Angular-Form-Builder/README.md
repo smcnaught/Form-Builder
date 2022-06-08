@@ -23,4 +23,4 @@
   - [X] Date and Time Input
   - [X] Multi Select Input (checkboxes)
   - [X] Single Select Input (radio buttons)
-  - [ ] Multimedia Input
+  - [X] Multimedia Input
