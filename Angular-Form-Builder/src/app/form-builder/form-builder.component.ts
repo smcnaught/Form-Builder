@@ -115,22 +115,22 @@ export class FormBuilderComponent implements OnInit {
           { 'column0': { name: 'name-multiSelect', type: DraggedElementType.multiSelect, value: [{ value: 'one', checked: false }, { value: 'two', checked: false }, { value: 'three', checked: false }] }, 'column1': { name: 'name-singleSelect', type: DraggedElementType.singleSelect, value: [{ value: 'one', checked: false }, { value: 'two', checked: false }, { value: 'three', checked: false }] } }, // row 2
         ],
       },
-      {
-        settings: { id: 201, title: 'Colors' },
-        data: [
-          { 'column0': { name: 'blue label', type: DraggedElementType.text, value: 'blue' }, 'column1': { name: 'orange label', type: DraggedElementType.text, value: 'orange' } }, // row 0
-          { 'column0': { name: 'red label', type: DraggedElementType.text, value: 'red' }, 'column1': { name: 'purple label', type: DraggedElementType.text, value: 'purple' } }, // row 1
-          { 'column0': { name: 'yellow label', type: DraggedElementType.text, value: 'yellow' }, 'column1': { name: 'pink label', type: DraggedElementType.text, value: 'pink' } }, // row 2
-        ]
-      },
-      {
-        settings: { id: 985, title: 'Places' },
-        data: [
-          { 'column0': { name: 'nyc label', type: DraggedElementType.text, value: 'NYC' }, 'column1': { name: 'spain label', type: DraggedElementType.text, value: 'Spain' } }, // row 0
-          { 'column0': { name: 'la label', type: DraggedElementType.text, value: 'Los Angeles' }, 'column1': { name: 'greece label', type: DraggedElementType.text, value: 'Greece' } }, // row 1
-          { 'column0': { name: 'london label', type: DraggedElementType.text, value: 'London' }, 'column1': { name: 'banff label', type: DraggedElementType.text, value: 'Banff' } }, // row 2
-        ]
-      }
+      // {
+      //   settings: { id: 201, title: 'Colors' },
+      //   data: [
+      //     { 'column0': { name: 'blue label', type: DraggedElementType.text, value: 'blue' }, 'column1': { name: 'orange label', type: DraggedElementType.text, value: 'orange' } }, // row 0
+      //     { 'column0': { name: 'red label', type: DraggedElementType.text, value: 'red' }, 'column1': { name: 'purple label', type: DraggedElementType.text, value: 'purple' } }, // row 1
+      //     { 'column0': { name: 'yellow label', type: DraggedElementType.text, value: 'yellow' }, 'column1': { name: 'pink label', type: DraggedElementType.text, value: 'pink' } }, // row 2
+      //   ]
+      // },
+      // {
+      //   settings: { id: 985, title: 'Places' },
+      //   data: [
+      //     { 'column0': { name: 'nyc label', type: DraggedElementType.text, value: 'NYC' }, 'column1': { name: 'spain label', type: DraggedElementType.text, value: 'Spain' } }, // row 0
+      //     { 'column0': { name: 'la label', type: DraggedElementType.text, value: 'Los Angeles' }, 'column1': { name: 'greece label', type: DraggedElementType.text, value: 'Greece' } }, // row 1
+      //     { 'column0': { name: 'london label', type: DraggedElementType.text, value: 'London' }, 'column1': { name: 'banff label', type: DraggedElementType.text, value: 'Banff' } }, // row 2
+      //   ]
+      // }
     ]
   }
 }

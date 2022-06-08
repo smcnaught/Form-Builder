@@ -1,7 +1,7 @@
 export interface IItem {
   name: string;
   type: DraggedElementType,
-  value: FormItems.TextInput | FormItems.NumberInput |  FormItems.IDateTimeInput | FormItems.ISelectInput[];
+  value: FormItems.TextInput | FormItems.NumberInput |  FormItems.IDateTimeInput | FormItems.ISelectInput[] | FormItems.MultimediaInput;
 }
 
 export interface IRemoveItem {
@@ -50,6 +50,7 @@ export interface ISectionData {
 export namespace FormItems {
   export type TextInput = string;
   export type NumberInput = number;
+  export type MultimediaInput = File;
 
   export interface IDateTimeInput {
     date: string;
@@ -75,5 +76,6 @@ export enum DraggedElementType {
   number,
   dateTime,
   multiSelect,
-  singleSelect
+  singleSelect,
+  multimedia
 }

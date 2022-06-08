@@ -1,4 +1,4 @@
-<div *ngIf="item">
+<div *ngIf="item && item.type !== DraggedElementType.none">
   <div>ITEM SETTINGS: </div>
   
   <div>
@@ -12,7 +12,7 @@
     </span>
   </div>
 
-  <div *ngIf="item.type !== DraggedElementType.dateTime && item.type !== DraggedElementType.multiSelect && item.type !== DraggedElementType.singleSelect">
+  <div *ngIf="item.type === DraggedElementType.text || item.type === DraggedElementType.number">
     <span>Item Value: </span>
     <span>
       <input
@@ -66,12 +66,25 @@
         <mat-radio-button
           [value]="option.checked"
           [checked]="option.checked"
-          (change)="updateItem(true, i)">
+          (change)="updateSingleSelect(i)">
           <input [(ngModel)]="option.value" (ngModelChange)="updateItem()" />
         </mat-radio-button>
       </span>
 
     </div>
+  </div>
+
+  <div *ngIf="item.type === DraggedElementType.multimedia">
+    <span>File: {{ $any(item).value?.name || '' }} </span>
+    <span>
+      <input
+        #fileInput
+        hidden
+        type='file'
+        placeholder='Choose File'
+        (change)="updateMultimedia(($any($event)).target.files[0])" />
+      <button (click)="fileInput.click()">Choose File</button>
+    </span>
   </div>
 
 </div>

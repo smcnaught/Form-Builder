@@ -95,6 +95,11 @@ export class SectionComponent implements OnInit, OnDestroy {
     this.selectItem(item, column, row);
   }
 
+  public onSelectMultimedia(file: File, item: IItem, column: number, row: number): void {
+    item.value = file;
+    this.selectItem(item, column, row);
+  }
+
   public selectItem(item: IItem, column: number, row: number): void {
     this.selectedItemLocation.column = column;
     this.selectedItemLocation.row = row;
@@ -201,7 +206,7 @@ export class SectionComponent implements OnInit, OnDestroy {
 
   private addNewItem(movingToEmptySpace: boolean, movingToNewRow: boolean, columnAlreadyAdded: boolean): void {
     let newItem: IItem;
-    if (this.typeOfDraggedElement === DraggedElementType.text || this.typeOfDraggedElement === DraggedElementType.number) {
+    if (this.typeOfDraggedElement === DraggedElementType.text || this.typeOfDraggedElement === DraggedElementType.number || this.typeOfDraggedElement === DraggedElementType.multimedia) {
       newItem = { type: this.typeOfDraggedElement, value: '', name: '' }
     }
     else if (this.typeOfDraggedElement === DraggedElementType.dateTime) {
@@ -384,10 +389,14 @@ export class SectionComponent implements OnInit, OnDestroy {
 
   private setupSettingsListener(): void {
     const settingsSub = this.itemChangedFromSettings.subscribe((updatedItemInfo: IItemUpdatedFromSettingsInfo) => {
-      if (updatedItemInfo.isSingleSelect && this.selectedItemLocation.column && this.selectedItemLocation.row) {
-        this.changeSelectSingleItem(updatedItemInfo.singleSelectIndex, updatedItemInfo.item, this.selectedItemLocation.column, this.selectedItemLocation.row);
+      if (this.selectedItemLocation.column >= 0 && this.selectedItemLocation.row >= 0) {
+        if (updatedItemInfo.isSingleSelect) {
+          this.changeSelectSingleItem(updatedItemInfo.singleSelectIndex, updatedItemInfo.item, this.selectedItemLocation.column, this.selectedItemLocation.row);
+          this.updateItem(updatedItemInfo.item);
+        }
+        else if (updatedItemInfo.isMultimedia) this.onSelectMultimedia(updatedItemInfo.file, updatedItemInfo.item, this.selectedItemLocation.column, this.selectedItemLocation.row)
+        else this.updateItem(updatedItemInfo.item);
       }
-      this.updateItem(updatedItemInfo.item)
     })
 
     this.subscriptions.add(settingsSub);

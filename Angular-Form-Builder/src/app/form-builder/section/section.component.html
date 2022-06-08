@@ -193,6 +193,32 @@
           </div>
 
           <div
+            *ngIf="element[column].type === draggedElementEnum.multimedia"
+            class="draggable-element"
+            draggable="true"
+            (dragstart)="onDragStart($event, colIndex, rowIndex)"
+            (click)="selectItem(element[column], colIndex, rowIndex)" 
+            >
+            <span>
+              <label for="multimediaInput">
+                <input
+                  placeholder="Enter Label"
+                  [(ngModel)]='element[column].name'
+                  (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
+              </label>
+              <div>{{ element[column].value.name }}</div>
+                <input
+                  id="multimediaInput"
+                  class='input-field'
+                  type="file"
+                  hidden
+                  #fileInput
+                  (change)="onSelectMultimedia(($any($event)).target.files[0], element[column], colIndex, rowIndex)" />
+                <button (click)="fileInput.click()">Choose File</button>
+            </span>
+          </div>
+
+          <div
             class="right-droppable"
             (dragover)="onDragOver($event, rowIndex, colIndex + 1)"
             (drop)="onDrop(false)"
