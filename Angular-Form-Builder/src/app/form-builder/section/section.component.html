@@ -12,7 +12,7 @@
           (dragover)="onDragOver($event, rowIndex, colIndex - 1)"
           (dragenter)="toggleClass($event)"
           (dragleave)="toggleClass($event)"
-          (drop)="onDrop($event, false)"
+          (drop)="onDrop($event, false, false, true)"
         ></div>
 
         <div fxLayout="column" class="w-100 h-100">
@@ -22,7 +22,7 @@
             (dragover)="onDragOver($event, rowIndex, colIndex)"
             (dragenter)="toggleClass($event)"
             (dragleave)="toggleClass($event)"
-            (drop)="onDrop($event, true)"
+            (drop)="onDrop($event, true, false, false)"
           ></div>
 
           <div
@@ -233,7 +233,7 @@
             (dragover)="onDragOver($event, rowIndex + 1, colIndex)"
             (dragenter)="toggleClass($event)"
             (dragleave)="toggleClass($event)"
-            (drop)="onDrop($event, true)"
+            (drop)="onDrop($event, true, false, false)"
           ></div>
         </div>
 
@@ -243,14 +243,14 @@
           (dragover)="onDragOver($event, rowIndex, colIndex + 1)"
           (dragenter)="toggleClass($event)"
           (dragleave)="toggleClass($event)"
-          (drop)="onDrop($event, false)"
+          (drop)="onDrop($event, false, false, true)"
         ></div>
       </div>
 
       <div *ngIf="element[column].type === draggedElementEnum.none"
         class="all-droppable"
-        (dragover)="onDragOver($event, rowIndex, colIndex - 1)"
-        (drop)="onDrop($event, false, true)"
+        (dragover)="onDragOver($event, rowIndex, colIndex)"
+        (drop)="onDrop($event, false, true, false)"
       ></div>
 
     </td>
