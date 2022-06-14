@@ -1,45 +1,74 @@
-<button draggable="true" (dragstart)="onDragNewItemStart(DraggedElementType.text)">Text</button>
-<br><br>
-<button draggable="true" (dragstart)="onDragNewItemStart(DraggedElementType.number)">Number</button>
-<br><br>
-<button draggable="true" (dragstart)="onDragNewItemStart(DraggedElementType.dateTime)">Date & Time</button>
-<br><br>
-<button draggable="true" (dragstart)="onDragNewItemStart(DraggedElementType.multiSelect)">Multi Select</button>
-<br><br>
-<button draggable="true" (dragstart)="onDragNewItemStart(DraggedElementType.singleSelect)">Single Select</button>
-<br><br>
-<button draggable="true" (dragstart)="onDragNewItemStart(DraggedElementType.multimedia)">Media & Files</button>
+<div fxLayoutAlign="start start" class="w-100">
+  <div fxLayout="column" fxLayoutAlign="start center" class="panel-widths">
+    <h4 class="w-100">Item Types</h4>
+    <div draggable="true" class="draggable-item-type" fxLayout="row" fxLayoutAlign="start center" (dragend)="toggleDropZone(false)" (dragstart)="onDragNewItemStart(DraggedElementType.text)">
+      <mat-icon class="icon-style">abc</mat-icon>
+      <p class="text-font m-0">Text</p>
+    </div>
+    <div draggable="true" class="draggable-item-type" fxLayout="row" fxLayoutAlign="start center" (dragend)="toggleDropZone(false)" (dragstart)="onDragNewItemStart(DraggedElementType.number)">
+      <mat-icon class="icon-style">123</mat-icon>
+      <p class="text-font m-0">Number</p>
+    </div>
+    <div draggable="true" class="draggable-item-type" fxLayout="row" fxLayoutAlign="start center" (dragend)="toggleDropZone(false)" (dragstart)="onDragNewItemStart(DraggedElementType.dateTime)">
+      <mat-icon class="icon-style">today</mat-icon>
+      <p class="text-font m-0">Date & Time</p>
+    </div>
+    <div draggable="true" class="draggable-item-type" fxLayout="row" fxLayoutAlign="start center" (dragend)="toggleDropZone(false)" (dragstart)="onDragNewItemStart(DraggedElementType.multiSelect)">
+      <mat-icon class="icon-style">list</mat-icon>
+      <p class="text-font m-0">Multi Select</p>
+    </div>
+    <div draggable="true" class="draggable-item-type" fxLayout="row" fxLayoutAlign="start center" (dragend)="toggleDropZone(false)" (dragstart)="onDragNewItemStart(DraggedElementType.singleSelect)">
+      <mat-icon class="icon-style">list</mat-icon>
+      <p class="text-font m-0">Single Select</p>
+    </div>
+    <div draggable="true" class="draggable-item-type" fxLayout="row" fxLayoutAlign="start center" (dragend)="toggleDropZone(false)" (dragstart)="onDragNewItemStart(DraggedElementType.multimedia)">
+      <mat-icon class="icon-style">photo_camera</mat-icon>
+      <p class="text-font m-0">Media & Files</p>
+    </div>
+  </div>
 
-<div *ngFor="let section of allSections; let i = index;">
-  <div
-    class="section-droppable"
-    (dragover)="onDragOver($event, i - 1)"
-    (drop)="onDropSection()"
-  ></div>
+  <div fxLayout="column" class="w-100 center-section">
+    <div *ngFor="let section of allSections; let i = index;" class="w-100">
+      <div
+        [ngClass]="{'drop-zone': showSectionDropZones}"
+        class="section-droppable"
+        (dragover)="onDragOver($event, i - 1)"
+        (dragenter)="toggleClass($event)"
+        (dragleave)="toggleClass($event)"
+        (drop)="onDropSection()"
+      ></div>
 
-  <section
-    class="section-border"
-    draggable="true"
-    (dragstart)="onDragSection(i)"
-    [section]="section"
-    [typeOfDraggedElement]="draggedElementType"
-    [itemChangedFromSettings]="selectedItemChanged"
-    [itemMovedFromOtherSection]="itemToAddToOtherSection"
-    (dragBetweenSections)="setDataForDragBetweenSections($event)"
-    (selectedItem)="onSelectedItemChange($event)"
-    (removeFromSectionItemCameFrom)="removeItem($event)"
-    >
-  </section>
+      <section
+        class="section-border"
+        draggable="true"
+        (dragstart)="onDragSection(i)"
+        (dragend)="onDragSectionEnd()"
+        (toggleDropZone)="toggleDropZone($event)"
+        [showDropZones]="showItemDropZones | async"
+        [section]="section"
+        [typeOfDraggedElement]="draggedElementType"
+        [itemChangedFromSettings]="selectedItemChanged"
+        [itemMovedFromOtherSection]="itemToAddToOtherSection"
+        (dragBetweenSections)="setDataForDragBetweenSections($event)"
+        (selectedItem)="onSelectedItemChange($event)"
+        (removeFromSectionItemCameFrom)="removeItem($event)"
+        >
+      </section>
 
-  <div
-    class="section-droppable"
-    (dragover)="onDragOver($event, i + 1)"
-    (drop)="onDropSection()"
-  ></div>
+      <div
+        [ngClass]="{'drop-zone': showSectionDropZones}"
+        class="section-droppable"
+        (dragover)="onDragOver($event, i + 1)"
+        (dragenter)="toggleClass($event)"
+        (dragleave)="toggleClass($event)"
+        (drop)="onDropSection()"
+      ></div>
+    </div>
+  </div>
+
+  <settings
+    class="panel-widths"
+    [item]="selectedItem"
+    (updatedItem)="onUpdateSelectedItem($event)">
+  </settings>
 </div>
-
-<br><br>
-<settings
-  [item]="selectedItem"
-  (updatedItem)="onUpdateSelectedItem($event)">
-</settings>

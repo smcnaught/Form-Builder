@@ -1,29 +1,37 @@
 <h1>{{ sectionSettings.title }}</h1>
 
-<table mat-table [dataSource]="sectionData" class="mat-elevation-z8">
+<table mat-table [dataSource]="sectionData" class="mat-elevation-z8 w-100">
   <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns; let colIndex = index;">
-    
-    <td mat-cell *matCellDef="let element; let rowIndex = index;">
-      <div *ngIf="element[column].type != draggedElementEnum.none">
+
+    <td mat-cell *matCellDef="let element; let rowIndex = index;" class="td-style">
+      <div *ngIf="element[column].type != draggedElementEnum.none" fxLayout="row" class="h-100">
+
         <div
-          class="above-droppable"
-          (dragover)="onDragOver($event, rowIndex, colIndex)"
-          (drop)="onDrop(true)"
+          [ngClass]="{'drop-zone': showDropZones}"
+          class="left-droppable"
+          (dragover)="onDragOver($event, rowIndex, colIndex - 1)"
+          (dragenter)="toggleClass($event)"
+          (dragleave)="toggleClass($event)"
+          (drop)="onDrop($event, false)"
         ></div>
 
-        <div>
+        <div fxLayout="column" class="w-100 h-100">
           <div
-            class="left-droppable"
-            (dragover)="onDragOver($event, rowIndex, colIndex - 1)"
-            (drop)="onDrop(false)"
+            [ngClass]="{'drop-zone': showDropZones}"
+            class="above-droppable"
+            (dragover)="onDragOver($event, rowIndex, colIndex)"
+            (dragenter)="toggleClass($event)"
+            (dragleave)="toggleClass($event)"
+            (drop)="onDrop($event, true)"
           ></div>
 
           <div
             *ngIf="element[column].type === draggedElementEnum.text"
-            class="draggable-element"
+            class="draggable-element w-100 h-100"
             draggable="true"
             (dragstart)="onDragStart($event, colIndex, rowIndex)"
-            (click)="selectItem(element[column], colIndex, rowIndex)" 
+            (dragend)="onDragEnd()"
+            (click)="selectItem(element[column], colIndex, rowIndex)"
             >
             <span>
               <label for="textInput">
@@ -36,18 +44,18 @@
                 id="textInput"
                 type='text'
                 placeholder='Enter Text'
-                class='input-field'
-                [(ngModel)]='element[column].value' 
+                [(ngModel)]='element[column].value'
                 (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
             </span>
           </div>
 
           <div
             *ngIf="element[column].type === draggedElementEnum.number"
-            class="draggable-element"
+            class="draggable-element w-100 h-100"
             draggable="true"
             (dragstart)="onDragStart($event, colIndex, rowIndex)"
-            (click)="selectItem(element[column], colIndex, rowIndex)" 
+            (dragend)="onDragEnd()"
+            (click)="selectItem(element[column], colIndex, rowIndex)"
             >
             <span>
               <label for="numberInput">
@@ -60,18 +68,18 @@
                 id="numberInput"
                 type='number'
                 placeholder='Enter Number'
-                class='input-field'
-                [(ngModel)]='element[column].value' 
+                [(ngModel)]='element[column].value'
                 (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
             </span>
           </div>
 
           <div
             *ngIf="element[column].type === draggedElementEnum.dateTime"
-            class="draggable-element"
+            class="draggable-element w-100 h-100"
             draggable="true"
             (dragstart)="onDragStart($event, colIndex, rowIndex)"
-            (click)="selectItem(element[column], colIndex, rowIndex)" 
+            (dragend)="onDragEnd()"
+            (click)="selectItem(element[column], colIndex, rowIndex)"
             >
             <span>
               <label for="dateTimeInput">
@@ -80,23 +88,22 @@
                   [(ngModel)]='element[column].name'
                   (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
               </label>
-              <div class='input-field'>
-                <input
-                  id="dateTimeInput"
-                  type='date'
-                  [(ngModel)]='element[column].value.date' 
-                  (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
-                <input type="time" [(ngModel)]='element[column].value.time' (ngModelChange)="selectItem(element[column], colIndex, rowIndex)"/>
-              </div>
+              <input
+                id="dateTimeInput"
+                type='date'
+                [(ngModel)]='element[column].value.date'
+                (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
+              <input type="time" [(ngModel)]='element[column].value.time' (ngModelChange)="selectItem(element[column], colIndex, rowIndex)"/>
             </span>
           </div>
 
           <div
             *ngIf="element[column].type === draggedElementEnum.multiSelect"
-            class="draggable-element"
+            class="draggable-element w-100 h-100"
             draggable="true"
             (dragstart)="onDragStart($event, colIndex, rowIndex)"
-            (click)="selectItem(element[column], colIndex, rowIndex)" 
+            (dragend)="onDragEnd()"
+            (click)="selectItem(element[column], colIndex, rowIndex)"
             >
             <span>
               <label for="multiSelectInput">
@@ -137,7 +144,7 @@
                       </button>
                     </mat-menu>
 
-                </label><br>
+                </label>
               </div>
               <div><button (click)="addItemToSelect(rowIndex, colIndex)">Add Option</button></div>
             </span>
@@ -145,10 +152,11 @@
 
           <div
             *ngIf="element[column].type === draggedElementEnum.singleSelect"
-            class="draggable-element"
+            class="draggable-element w-100 h-100"
             draggable="true"
             (dragstart)="onDragStart($event, colIndex, rowIndex)"
-            (click)="selectItem(element[column], colIndex, rowIndex)" 
+            (dragend)="onDragEnd()"
+            (click)="selectItem(element[column], colIndex, rowIndex)"
             >
             <span>
               <mat-label>
@@ -157,7 +165,7 @@
                   [(ngModel)]='element[column].name'
                   (ngModelChange)="selectItem(element[column], colIndex, rowIndex)" />
               </mat-label>
-            
+
               <mat-radio-group>
                 <div *ngFor="let item of element[column].value; let i = index;">
                   <mat-radio-button
@@ -194,10 +202,11 @@
 
           <div
             *ngIf="element[column].type === draggedElementEnum.multimedia"
-            class="draggable-element"
+            class="draggable-element w-100 h-100"
             draggable="true"
             (dragstart)="onDragStart($event, colIndex, rowIndex)"
-            (click)="selectItem(element[column], colIndex, rowIndex)" 
+            (dragend)="onDragEnd()"
+            (click)="selectItem(element[column], colIndex, rowIndex)"
             >
             <span>
               <label for="multimediaInput">
@@ -209,7 +218,6 @@
               <div>{{ element[column].value.name }}</div>
                 <input
                   id="multimediaInput"
-                  class='input-field'
                   type="file"
                   hidden
                   #fileInput
@@ -218,25 +226,31 @@
             </span>
           </div>
 
-          <div
-            class="right-droppable"
-            (dragover)="onDragOver($event, rowIndex, colIndex + 1)"
-            (drop)="onDrop(false)"
-          ></div>
 
+          <div
+            [ngClass]="{'drop-zone': showDropZones}"
+            class="below-droppable"
+            (dragover)="onDragOver($event, rowIndex + 1, colIndex)"
+            (dragenter)="toggleClass($event)"
+            (dragleave)="toggleClass($event)"
+            (drop)="onDrop($event, true)"
+          ></div>
         </div>
 
         <div
-          class="below-droppable"
-          (dragover)="onDragOver($event, rowIndex + 1, colIndex)"
-          (drop)="onDrop(true)"
+          [ngClass]="{'drop-zone': showDropZones}"
+          class="right-droppable"
+          (dragover)="onDragOver($event, rowIndex, colIndex + 1)"
+          (dragenter)="toggleClass($event)"
+          (dragleave)="toggleClass($event)"
+          (drop)="onDrop($event, false)"
         ></div>
       </div>
 
       <div *ngIf="element[column].type === draggedElementEnum.none"
         class="all-droppable"
-        (dragover)="onDragOver($event, rowIndex, colIndex)"
-        (drop)="onDrop(false, true)"
+        (dragover)="onDragOver($event, rowIndex, colIndex - 1)"
+        (drop)="onDrop($event, false, true)"
       ></div>
 
     </td>

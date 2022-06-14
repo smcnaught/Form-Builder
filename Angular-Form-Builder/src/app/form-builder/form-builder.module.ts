@@ -13,6 +13,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormBuilderComponent } from './form-builder.component';
 import { SectionComponent } from './section/section.component';
 import { SettingsComponent } from './settings/settings.component';
+import { FlexLayoutModule } from '@angular/flex-layout';
+import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
   declarations: [
@@ -30,7 +32,9 @@ import { SettingsComponent } from './settings/settings.component';
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
-    MatMenuModule
+    MatMenuModule,
+    MatButtonModule,
+    FlexLayoutModule,
   ],
   exports: [FormBuilderComponent],
   providers: [],

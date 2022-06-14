@@ -28,10 +28,12 @@ export class SectionComponent implements OnInit, OnDestroy {
   @Input() typeOfDraggedElement: DraggedElementType;
   @Input() itemChangedFromSettings: Subject<IItemUpdatedFromSettingsInfo>;
   @Input() itemMovedFromOtherSection: IItem = null; // needs to be set to null
+  @Input() showDropZones: boolean;
+  @Output() toggleDropZone = new EventEmitter<boolean>();
   @Output() dragBetweenSections = new EventEmitter<IDragBetweenSectionsData>();
   @Output() selectedItem = new EventEmitter<IItem>();
   @Output() removeFromSectionItemCameFrom = new EventEmitter<boolean>();
-  
+
   public displayedColumns: string[] = ['column0', 'column1'];
   public sectionData: ISectionData[];
   public sectionSettings: ISectionSettings;
@@ -51,7 +53,9 @@ export class SectionComponent implements OnInit, OnDestroy {
 
   public get draggedElementEnum() { return DraggedElementType };
 
-  public onDrop(movingToRow: boolean, movingToEmptySpace?: boolean): void {
+  public onDrop(event: DragEvent, movingToRow: boolean, movingToEmptySpace?: boolean): void {
+    this.toggleClass(event)
+    this.toggleDropZone.emit(false);
     const movingItemFromThisSection = this.dragInfo.draggedItemColumn !== null && this.dragInfo.draggedItemColumn !== null;
     const movingFromDifferentSection = !movingItemFromThisSection && this.itemMovedFromOtherSection !== null;
     const addingNewColumn = !this.displayedColumns.includes('column'+this.dragInfo.moveToColumn);
@@ -70,6 +74,7 @@ export class SectionComponent implements OnInit, OnDestroy {
 
   public onDragStart(event: DragEvent, columnIndex: number, rowIndex: number): void {
     if (event) {
+      this.toggleDropZone.emit(true);
       this.dragInfo.draggedItemColumn = columnIndex;
       this.dragInfo.draggedItemRow = rowIndex;
 
@@ -80,6 +85,20 @@ export class SectionComponent implements OnInit, OnDestroy {
       }
 
       this.dragBetweenSections.emit(dragBetweenSectionsData);
+    }
+  }
+
+  public onDragEnd(): void {
+    this.toggleDropZone.emit(false)
+  }
+
+  public toggleClass(event: any) {
+    const hasClass = event.target.classList.contains('drop-zone-hover');
+
+    if(hasClass) {
+      event.target.classList.remove('drop-zone-hover');
+    } else {
+      event.target.classList.add('drop-zone-hover');
     }
   }
 
@@ -124,6 +143,10 @@ export class SectionComponent implements OnInit, OnDestroy {
     (<FormItems.ISelectInput[]>this.sectionData[row]['column'+column].value).splice(movingFrom + 1, 0, itemMoving);
   }
 
+  public checkDropZoneHover(rowIndex: number, columnIndex: number): boolean {
+    return this.dragInfo.moveToRow === rowIndex && this.dragInfo.moveToColumn === columnIndex
+  }
+
   private removeItem(removeInfo: IRemoveItem): void {
     if (this.sectionSettings.id === removeInfo.sectionID) {
       this.sectionData[removeInfo.row]['column'+removeInfo.column] = { name: '', type: DraggedElementType.none, value: '' };
@@ -147,7 +170,7 @@ export class SectionComponent implements OnInit, OnDestroy {
         columnWithData: this.dragInfo.moveToColumn,
         columnData: dataToMove,
       }
-      
+
       let removeInfo: IRemoveItem = {
         column: this.dragInfo.draggedItemColumn,
         row: this.dragInfo.draggedItemRow,
@@ -194,7 +217,7 @@ export class SectionComponent implements OnInit, OnDestroy {
       this.displayedColumns.forEach((column: string) => {
         newRow[column] = { type: DraggedElementType.none, value: '', name: '' }
       })
-  
+
       newRow['column' + this.dragInfo.moveToColumn] = this.itemMovedFromOtherSection;
       this.sectionData.splice(this.dragInfo.moveToRow, 0, newRow);
     }
@@ -253,7 +276,7 @@ export class SectionComponent implements OnInit, OnDestroy {
         newRow['column'+insertNewAt] = { type: DraggedElementType.none, value: '', name: '' };
         newSectionData.push(newRow);
       }
-      
+
       this.sectionData = JSON.parse(JSON.stringify(newSectionData));
       this.displayedColumns.push('column'+newColumnNumber);
     }
@@ -267,7 +290,7 @@ export class SectionComponent implements OnInit, OnDestroy {
           newColumnNumber = +column.substring(6) + 1;
           newRow['column'+newColumnNumber] = this.sectionData[i][column];
         })
-        
+
         newRow['column0'] = { name: '', type: DraggedElementType.none, value: '' };
         newSectionData.push(newRow);
       }
@@ -282,7 +305,7 @@ export class SectionComponent implements OnInit, OnDestroy {
       this.sectionData.forEach((row: ISectionData) => {
         row[columnName] = { name: '', type: DraggedElementType.none, value: '' };
       })
-  
+
       this.displayedColumns.push(columnName);
     }
 
@@ -303,11 +326,11 @@ export class SectionComponent implements OnInit, OnDestroy {
     let itemToMove: IItem;
     let itemReplacing: IItem = this.sectionData[removeInfo.row]['column'+removeInfo.column];
     this.removeItem(removeInfo);
-    
+
     const changingColumn: string = 'column'+addInfo.column;
     for (let i = addInfo.row; i < this.sectionData.length; i++) {
       itemToMove = this.sectionData[i][changingColumn];
-      this.sectionData[i][changingColumn] = itemReplacing;      
+      this.sectionData[i][changingColumn] = itemReplacing;
       itemReplacing = itemToMove;
     }
 
@@ -317,7 +340,7 @@ export class SectionComponent implements OnInit, OnDestroy {
       columnWithData: addInfo.column,
       columnData: itemToMove
     }
-    
+
     this.addRow(newRowInfo);
   }
 
