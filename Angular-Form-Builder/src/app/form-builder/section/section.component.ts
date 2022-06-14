@@ -27,6 +27,7 @@ export class SectionComponent implements OnInit, OnDestroy {
   @Input() section: ISection;
   @Input() typeOfDraggedElement: DraggedElementType;
   @Input() itemChangedFromSettings: Subject<IItemUpdatedFromSettingsInfo>;
+  @Input() userDraggingSection: Subject<boolean>;
   @Input() itemMovedFromOtherSection: IItem = null; // needs to be set to null
   @Input() showDropZones: boolean;
   @Output() toggleDropZone = new EventEmitter<boolean>();
@@ -45,6 +46,7 @@ export class SectionComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     this.setupPage();
     this.setupSettingsListener();
+    this.setupUserDraggingSectionListener();
   }
 
   public ngOnDestroy(): void {
@@ -54,28 +56,30 @@ export class SectionComponent implements OnInit, OnDestroy {
   public get draggedElementEnum() { return DraggedElementType };
 
   public onDrop(event: DragEvent, movingToRow: boolean, movingToEmptySpace?: boolean, movingToLeftOrRight?: boolean): void {
-    this.toggleClass(event)
-    this.toggleDropZone.emit(false);
-    const movingItemFromThisSection = this.dragInfo.draggedItemColumn !== null && this.dragInfo.draggedItemColumn !== null;
-    const movingFromDifferentSection = !movingItemFromThisSection && this.itemMovedFromOtherSection !== null;
-    const addingColumnToFarLeftOrFarRight = !this.displayedColumns.includes('column'+this.dragInfo.moveToColumn);
-    const movingItemFromThisSectionToNewColumn = !addingColumnToFarLeftOrFarRight && movingToLeftOrRight;
-
-    if (addingColumnToFarLeftOrFarRight) {
-      const addingToLeft = this.dragInfo.moveToColumn === -1;
-      this.addColumn(addingToLeft, !addingToLeft);
+    if (!this.dragInfo.draggedItemIsSection) {
+      this.toggleClass(event)
+      this.toggleDropZone.emit(false);
+      const movingItemFromThisSection = this.dragInfo.draggedItemColumn !== null && this.dragInfo.draggedItemColumn !== null;
+      const movingFromDifferentSection = !movingItemFromThisSection && this.itemMovedFromOtherSection !== null;
+      const addingColumnToFarLeftOrFarRight = !this.displayedColumns.includes('column'+this.dragInfo.moveToColumn);
+      const movingItemFromThisSectionToNewColumn = !addingColumnToFarLeftOrFarRight && movingToLeftOrRight;
+  
+      if (addingColumnToFarLeftOrFarRight) {
+        const addingToLeft = this.dragInfo.moveToColumn === -1;
+        this.addColumn(addingToLeft, !addingToLeft);
+      }
+      else if (movingItemFromThisSectionToNewColumn) {
+        this.addColumn(false, false, this.dragInfo.moveToColumn);
+        this.dragInfo.draggedItemColumn++;
+      }
+  
+      if (movingItemFromThisSection || movingItemFromThisSectionToNewColumn) this.moveExistingItem();
+      else if (movingFromDifferentSection) this.addItemFromOtherSection(movingToEmptySpace);
+      else this.addNewItem(movingToEmptySpace, movingToRow, addingColumnToFarLeftOrFarRight);
+      this.resetDragInfo();
+      this.checkDeleteEmptyRows();
+      this.checkDeleteEmptyColumns();
     }
-    else if (movingItemFromThisSectionToNewColumn) {
-      this.addColumn(false, false, this.dragInfo.moveToColumn);
-      this.dragInfo.draggedItemColumn++;
-    }
-
-    if (movingItemFromThisSection || movingItemFromThisSectionToNewColumn) this.moveExistingItem();
-    else if (movingFromDifferentSection) this.addItemFromOtherSection(movingToEmptySpace);
-    else this.addNewItem(movingToEmptySpace, movingToRow, addingColumnToFarLeftOrFarRight);
-    this.resetDragInfo();
-    this.checkDeleteEmptyRows();
-    this.checkDeleteEmptyColumns();
   }
 
   public onDragStart(event: DragEvent, columnIndex: number, rowIndex: number): void {
@@ -91,6 +95,7 @@ export class SectionComponent implements OnInit, OnDestroy {
       }
 
       this.dragBetweenSections.emit(dragBetweenSectionsData);
+      this.dragInfo.draggedItemIsSection = false;
     }
   }
 
@@ -413,6 +418,7 @@ export class SectionComponent implements OnInit, OnDestroy {
       draggedItemRow: null,
       moveToColumn: null,
       moveToRow: null,
+      draggedItemIsSection: false
     }
   }
 
@@ -429,5 +435,13 @@ export class SectionComponent implements OnInit, OnDestroy {
     })
 
     this.subscriptions.add(settingsSub);
+  }
+
+  private setupUserDraggingSectionListener(): void {
+    const draggingSectionSub = this.userDraggingSection.subscribe((isDraggingSection: boolean) => {
+      this.dragInfo.draggedItemIsSection = isDraggingSection;
+    })
+
+    this.subscriptions.add(draggingSectionSub);
   }
 }

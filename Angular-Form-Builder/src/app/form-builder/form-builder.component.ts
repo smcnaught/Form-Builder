@@ -12,6 +12,7 @@ import { DraggedElementType, IDragBetweenSectionsData, IItem, ISection } from '.
 export class FormBuilderComponent implements OnInit {
   public selectedItem: IItem;
   public selectedItemChanged: Subject<IItemUpdatedFromSettingsInfo> = new Subject();
+  public userDraggingSection: Subject<boolean> = new Subject();
   public allSections: Array<ISection>;
   public itemToAddToOtherSection: IItem = null; // needs to be set to null
   public draggedElementType: DraggedElementType;
@@ -45,6 +46,7 @@ export class FormBuilderComponent implements OnInit {
   public onDragSection(draggedIndex: number): void {
     this.showSectionDropZones = true;
     this.moveSectionInfo.draggedSectionIndex = draggedIndex;
+    this.userDraggingSection.next(true);
   }
 
   public onDragSectionEnd(): void {

@@ -27,6 +27,7 @@ export interface ISwitchInfo {
 }
 
 export interface IDragInfo {
+  draggedItemIsSection: boolean;
   draggedItemColumn: number;
   draggedItemRow: number;
   moveToColumn: number;
