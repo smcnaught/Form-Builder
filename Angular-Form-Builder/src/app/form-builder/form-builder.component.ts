@@ -100,7 +100,8 @@ export class FormBuilderComponent implements OnInit {
       this.allSections[sectionIndex].data[this.removeItemInfo.draggedRow]['column'+this.removeItemInfo.draggedColumn] = {
         name: '',
         type: DraggedElementType.none,
-        value: ''
+        value: '',
+        settings: { required: false }
       }
     }
 
@@ -150,25 +151,25 @@ export class FormBuilderComponent implements OnInit {
       {
         settings: { id: 150, title: 'Animals' },
         data: [
-          { 'column0': { name: 'name-pup-count', type: DraggedElementType.number, value: 512 }, 'column1': { name: 'name-bird', type: DraggedElementType.text, value: 'bird' } }, // row 0
-          { 'column0': { name: 'name-date-time', type: DraggedElementType.dateTime, value: { date: '2018-07-22', time: '13:30' } }, 'column1': { name: 'name-monkey', type: DraggedElementType.text, value: 'monkey' } }, // row 1
-          { 'column0': { name: 'name-multiSelect', type: DraggedElementType.multiSelect, value: [{ value: 'one', checked: false }, { value: 'two', checked: false }, { value: 'three', checked: false }] }, 'column1': { name: 'name-singleSelect', type: DraggedElementType.singleSelect, value: [{ value: 'one', checked: false }, { value: 'two', checked: false }, { value: 'three', checked: false }] } }, // row 2
+          { 'column0': { name: 'name-pup-count', type: DraggedElementType.number, value: 512, settings: { required: true } }, 'column1': { name: 'name-bird', type: DraggedElementType.text, value: 'bird', settings: { required: true } } }, // row 0
+          { 'column0': { name: 'name-date-time', type: DraggedElementType.dateTime, value: { date: '2018-07-22', time: '13:30' }, settings: { required: true } }, 'column1': { name: 'name-monkey', type: DraggedElementType.text, value: 'monkey', settings: { required: true } } }, // row 1
+          { 'column0': { name: 'name-multiSelect', type: DraggedElementType.multiSelect, value: [{ value: 'one', checked: false }, { value: 'two', checked: false }, { value: 'three', checked: false }], settings: { required: true } }, 'column1': { name: 'name-singleSelect', type: DraggedElementType.singleSelect, value: [{ value: 'one', checked: false }, { value: 'two', checked: false }, { value: 'three', checked: false }], settings: { required: true } } }, // row 2
         ],
       },
       {
         settings: { id: 201, title: 'Colors' },
         data: [
-          { 'column0': { name: 'blue label', type: DraggedElementType.text, value: 'blue' }, 'column1': { name: 'orange label', type: DraggedElementType.text, value: 'orange' } }, // row 0
-          { 'column0': { name: 'red label', type: DraggedElementType.text, value: 'red' }, 'column1': { name: 'purple label', type: DraggedElementType.text, value: 'purple' } }, // row 1
-          { 'column0': { name: 'yellow label', type: DraggedElementType.text, value: 'yellow' }, 'column1': { name: 'pink label', type: DraggedElementType.text, value: 'pink' } }, // row 2
+          { 'column0': { name: 'blue label', type: DraggedElementType.text, value: 'blue', settings: { required: true } }, 'column1': { name: 'orange label', type: DraggedElementType.text, value: 'orange', settings: { required: true } } }, // row 0
+          { 'column0': { name: 'red label', type: DraggedElementType.text, value: 'red', settings: { required: true } }, 'column1': { name: 'purple label', type: DraggedElementType.text, value: 'purple', settings: { required: true } } }, // row 1
+          { 'column0': { name: 'yellow label', type: DraggedElementType.text, value: 'yellow', settings: { required: true } }, 'column1': { name: 'pink label', type: DraggedElementType.text, value: 'pink', settings: { required: true } } }, // row 2
         ]
       },
       {
         settings: { id: 985, title: 'Places' },
         data: [
-          { 'column0': { name: 'nyc label', type: DraggedElementType.text, value: 'NYC' }, 'column1': { name: 'spain label', type: DraggedElementType.text, value: 'Spain' } }, // row 0
-          { 'column0': { name: 'la label', type: DraggedElementType.text, value: 'Los Angeles' }, 'column1': { name: 'greece label', type: DraggedElementType.text, value: 'Greece' } }, // row 1
-          { 'column0': { name: 'london label', type: DraggedElementType.text, value: 'London' }, 'column1': { name: 'banff label', type: DraggedElementType.text, value: 'Banff' } }, // row 2
+          { 'column0': { name: 'nyc label', type: DraggedElementType.text, value: 'NYC', settings: { required: true } }, 'column1': { name: 'spain label', type: DraggedElementType.text, value: 'Spain', settings: { required: true } } }, // row 0
+          { 'column0': { name: 'la label', type: DraggedElementType.text, value: 'Los Angeles', settings: { required: true } }, 'column1': { name: 'greece label', type: DraggedElementType.text, value: 'Greece', settings: { required: true } } }, // row 1
+          { 'column0': { name: 'london label', type: DraggedElementType.text, value: 'London', settings: { required: true } }, 'column1': { name: 'banff label', type: DraggedElementType.text, value: 'Banff', settings: { required: true } } }, // row 2
         ]
       }
     ]

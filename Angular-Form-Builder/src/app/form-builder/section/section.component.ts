@@ -160,7 +160,7 @@ export class SectionComponent implements OnInit, OnDestroy {
 
   private removeItem(removeInfo: IRemoveItem): void {
     if (this.sectionSettings.id === removeInfo.sectionID) {
-      this.sectionData[removeInfo.row]['column'+removeInfo.column] = { name: '', type: DraggedElementType.none, value: '' };
+      this.sectionData[removeInfo.row]['column'+removeInfo.column] = { name: '', type: DraggedElementType.none, value: '', settings: { required: false } };
     }
   }
 
@@ -226,7 +226,7 @@ export class SectionComponent implements OnInit, OnDestroy {
     else {
       let newRow: ISectionData = {};
       this.displayedColumns.forEach((column: string) => {
-        newRow[column] = { type: DraggedElementType.none, value: '', name: '' }
+        newRow[column] = { type: DraggedElementType.none, value: '', name: '', settings: { required: false } }
       })
 
       newRow['column' + this.dragInfo.moveToColumn] = this.itemMovedFromOtherSection;
@@ -241,13 +241,13 @@ export class SectionComponent implements OnInit, OnDestroy {
   private addNewItem(movingToEmptySpace: boolean, movingToNewRow: boolean, columnAlreadyAdded: boolean): void {
     let newItem: IItem;
     if (this.typeOfDraggedElement === DraggedElementType.text || this.typeOfDraggedElement === DraggedElementType.number || this.typeOfDraggedElement === DraggedElementType.multimedia) {
-      newItem = { type: this.typeOfDraggedElement, value: '', name: '' }
+      newItem = { type: this.typeOfDraggedElement, value: '', name: '', settings: { required: false } }
     }
     else if (this.typeOfDraggedElement === DraggedElementType.dateTime) {
-      newItem = { type: this.typeOfDraggedElement, value: { date: '', time: '' }, name: '' }
+      newItem = { type: this.typeOfDraggedElement, value: { date: '', time: '' }, name: '', settings: { required: false } }
     }
     else if (this.typeOfDraggedElement === DraggedElementType.multiSelect || this.typeOfDraggedElement === DraggedElementType.singleSelect) {
-      newItem = { type: this.typeOfDraggedElement, value: [], name: '' }
+      newItem = { type: this.typeOfDraggedElement, value: [], name: '', settings: { required: false } }
     }
 
     if (movingToEmptySpace) {
@@ -256,7 +256,7 @@ export class SectionComponent implements OnInit, OnDestroy {
     else if (movingToNewRow) {
       let newRow: ISectionData = {};
       this.displayedColumns.forEach((columnName: string) => {
-        newRow[columnName] = { type: DraggedElementType.none, value: '', name: '' }
+        newRow[columnName] = { type: DraggedElementType.none, value: '', name: '', settings: { required: false } }
       })
 
       newRow['column' + this.dragInfo.moveToColumn] = newItem;
@@ -284,7 +284,7 @@ export class SectionComponent implements OnInit, OnDestroy {
           else if (columnNumber >= insertNewAt) newRow['column'+ newColumnNumber] = this.sectionData[i][column];
         })
 
-        newRow['column'+insertNewAt] = { type: DraggedElementType.none, value: '', name: '' };
+        newRow['column'+insertNewAt] = { type: DraggedElementType.none, value: '', name: '', settings: { required: false } };
         newSectionData.push(newRow);
       }
 
@@ -302,7 +302,7 @@ export class SectionComponent implements OnInit, OnDestroy {
           newRow['column'+newColumnNumber] = this.sectionData[i][column];
         })
 
-        newRow['column0'] = { name: '', type: DraggedElementType.none, value: '' };
+        newRow['column0'] = { name: '', type: DraggedElementType.none, value: '', settings: { required: false } };
         newSectionData.push(newRow);
       }
 
@@ -314,7 +314,7 @@ export class SectionComponent implements OnInit, OnDestroy {
     else if (addingToFarRight) {
       const columnName: string = 'column' + this.dragInfo.moveToColumn;
       this.sectionData.forEach((row: ISectionData) => {
-        row[columnName] = { name: '', type: DraggedElementType.none, value: '' };
+        row[columnName] = { name: '', type: DraggedElementType.none, value: '', settings: { required: false } };
       })
 
       this.displayedColumns.push(columnName);
@@ -359,7 +359,7 @@ export class SectionComponent implements OnInit, OnDestroy {
     let row: ISectionData = {};
     for (let i = 0; i < newRowInfo.totalColumns; i++) {
       if (i === newRowInfo.columnWithData) row['column'+i] = newRowInfo.columnData;
-      else row['column'+i] = { type: DraggedElementType.none, value: null, name: null };
+      else row['column'+i] = { type: DraggedElementType.none, value: null, name: null, settings: { required: false } };
     }
 
     this.sectionData.push(row);

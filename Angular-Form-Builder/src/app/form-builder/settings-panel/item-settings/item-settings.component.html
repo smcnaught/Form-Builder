@@ -12,6 +12,16 @@
     </span>
   </div>
 
+  <div>
+    <span>Item Required: </span>
+    <span>
+      <input
+        type='checkbox'
+        [(ngModel)]='item.settings.required'
+        (ngModelChange)="updateItem()" />
+    </span>
+  </div>
+
   <div *ngIf="item.type === DraggedElementType.text || item.type === DraggedElementType.number">
     <span>Item Value: </span>
     <span>
