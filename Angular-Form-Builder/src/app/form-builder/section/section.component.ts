@@ -53,20 +53,26 @@ export class SectionComponent implements OnInit, OnDestroy {
 
   public get draggedElementEnum() { return DraggedElementType };
 
-  public onDrop(event: DragEvent, movingToRow: boolean, movingToEmptySpace?: boolean): void {
+  public onDrop(event: DragEvent, movingToRow: boolean, movingToEmptySpace?: boolean, movingToLeftOrRight?: boolean): void {
     this.toggleClass(event)
     this.toggleDropZone.emit(false);
     const movingItemFromThisSection = this.dragInfo.draggedItemColumn !== null && this.dragInfo.draggedItemColumn !== null;
     const movingFromDifferentSection = !movingItemFromThisSection && this.itemMovedFromOtherSection !== null;
-    const addingNewColumn = !this.displayedColumns.includes('column'+this.dragInfo.moveToColumn);
-    if (addingNewColumn) {
+    const addingColumnToFarLeftOrFarRight = !this.displayedColumns.includes('column'+this.dragInfo.moveToColumn);
+    const movingItemFromThisSectionToNewColumn = !addingColumnToFarLeftOrFarRight && movingToLeftOrRight;
+
+    if (addingColumnToFarLeftOrFarRight) {
       const addingToLeft = this.dragInfo.moveToColumn === -1;
       this.addColumn(addingToLeft, !addingToLeft);
     }
+    else if (movingItemFromThisSectionToNewColumn) {
+      this.addColumn(false, false, this.dragInfo.moveToColumn);
+      this.dragInfo.draggedItemColumn++;
+    }
 
-    if (movingItemFromThisSection) this.moveExistingItem();
+    if (movingItemFromThisSection || movingItemFromThisSectionToNewColumn) this.moveExistingItem();
     else if (movingFromDifferentSection) this.addItemFromOtherSection(movingToEmptySpace);
-    else this.addNewItem(movingToEmptySpace, movingToRow, addingNewColumn);
+    else this.addNewItem(movingToEmptySpace, movingToRow, addingColumnToFarLeftOrFarRight);
     this.resetDragInfo();
     this.checkDeleteEmptyRows();
     this.checkDeleteEmptyColumns();
