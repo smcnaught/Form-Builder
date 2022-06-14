@@ -1,1 +1,28 @@
 @import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+
+.w-100 {
+  width: 100%;
+}
+
+.h-100 {
+  height: 100%;
+}
+
+.m-0 {
+  margin: 0;
+}
+
+.drop-zone {
+  &:not(.drop-zone-hover) {
+    border: 2px dotted #697D91 !important;
+    background-color: #F9FAFB;
+  }
+  &.drop-zone-hover {
+    border: 2px dotted #0598FA !important;
+    background-color: #BEE4FE;
+  }
+}
+
+body {
+  margin: 0;
+}

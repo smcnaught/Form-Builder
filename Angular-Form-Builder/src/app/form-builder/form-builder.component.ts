@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 import { IItemUpdatedFromSettingsInfo } from './settings/settings.component';
 import { DraggedElementType, IDragBetweenSectionsData, IItem, ISection } from './shared/types';
@@ -15,6 +15,8 @@ export class FormBuilderComponent implements OnInit {
   public allSections: Array<ISection>;
   public itemToAddToOtherSection: IItem = null; // needs to be set to null
   public draggedElementType: DraggedElementType;
+  public showItemDropZones: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  public showSectionDropZones = false;
 
   private removeItemInfo: IDragBetweenSectionsData;
   private moveSectionInfo = { draggedSectionIndex: null, moveToSectionIndex: null };
@@ -36,11 +38,17 @@ export class FormBuilderComponent implements OnInit {
   }
 
   public onDragNewItemStart(elementType: DraggedElementType): void {
+    this.toggleDropZone(true);
     this.draggedElementType = elementType;
   }
 
   public onDragSection(draggedIndex: number): void {
+    this.showSectionDropZones = true;
     this.moveSectionInfo.draggedSectionIndex = draggedIndex;
+  }
+
+  public onDragSectionEnd(): void {
+    this.showSectionDropZones = false;
   }
 
   public onDragOver(event: DragEvent, moveToIndex: number): void {
@@ -63,7 +71,7 @@ export class FormBuilderComponent implements OnInit {
     // add item to different section
     const sectionIndex = this.getIndexOfSection(dragInfo.fromSection);
     this.itemToAddToOtherSection = this.allSections[sectionIndex].data[dragInfo.draggedRow]['column'+dragInfo.draggedColumn];
-    
+
     // set remove info to be used when the user drops an item into a different section (in removeItem method).
     this.removeItemInfo = dragInfo;
   }
@@ -79,6 +87,20 @@ export class FormBuilderComponent implements OnInit {
     }
 
     this.checkDeleteEmptyRows();
+  }
+
+  public toggleDropZone(showZone: boolean): void {
+    this.showItemDropZones.next(showZone);
+  }
+
+  public toggleClass(event: any) {
+    const hasClass = event.target.classList.contains('drop-zone-hover');
+
+    if(hasClass) {
+      event.target.classList.remove('drop-zone-hover');
+    } else {
+      event.target.classList.add('drop-zone-hover');
+    }
   }
 
   private checkDeleteEmptyRows(): void {
@@ -108,29 +130,29 @@ export class FormBuilderComponent implements OnInit {
   private setSectionData(): void {
     this.allSections = [
       {
-        settings: { id: 150, title: 'Animals' }, 
+        settings: { id: 150, title: 'Animals' },
         data: [
           { 'column0': { name: 'name-pup-count', type: DraggedElementType.number, value: 512 }, 'column1': { name: 'name-bird', type: DraggedElementType.text, value: 'bird' } }, // row 0
           { 'column0': { name: 'name-date-time', type: DraggedElementType.dateTime, value: { date: '2018-07-22', time: '13:30' } }, 'column1': { name: 'name-monkey', type: DraggedElementType.text, value: 'monkey' } }, // row 1
           { 'column0': { name: 'name-multiSelect', type: DraggedElementType.multiSelect, value: [{ value: 'one', checked: false }, { value: 'two', checked: false }, { value: 'three', checked: false }] }, 'column1': { name: 'name-singleSelect', type: DraggedElementType.singleSelect, value: [{ value: 'one', checked: false }, { value: 'two', checked: false }, { value: 'three', checked: false }] } }, // row 2
         ],
       },
-      // {
-      //   settings: { id: 201, title: 'Colors' },
-      //   data: [
-      //     { 'column0': { name: 'blue label', type: DraggedElementType.text, value: 'blue' }, 'column1': { name: 'orange label', type: DraggedElementType.text, value: 'orange' } }, // row 0
-      //     { 'column0': { name: 'red label', type: DraggedElementType.text, value: 'red' }, 'column1': { name: 'purple label', type: DraggedElementType.text, value: 'purple' } }, // row 1
-      //     { 'column0': { name: 'yellow label', type: DraggedElementType.text, value: 'yellow' }, 'column1': { name: 'pink label', type: DraggedElementType.text, value: 'pink' } }, // row 2
-      //   ]
-      // },
-      // {
-      //   settings: { id: 985, title: 'Places' },
-      //   data: [
-      //     { 'column0': { name: 'nyc label', type: DraggedElementType.text, value: 'NYC' }, 'column1': { name: 'spain label', type: DraggedElementType.text, value: 'Spain' } }, // row 0
-      //     { 'column0': { name: 'la label', type: DraggedElementType.text, value: 'Los Angeles' }, 'column1': { name: 'greece label', type: DraggedElementType.text, value: 'Greece' } }, // row 1
-      //     { 'column0': { name: 'london label', type: DraggedElementType.text, value: 'London' }, 'column1': { name: 'banff label', type: DraggedElementType.text, value: 'Banff' } }, // row 2
-      //   ]
-      // }
+      {
+        settings: { id: 201, title: 'Colors' },
+        data: [
+          { 'column0': { name: 'blue label', type: DraggedElementType.text, value: 'blue' }, 'column1': { name: 'orange label', type: DraggedElementType.text, value: 'orange' } }, // row 0
+          { 'column0': { name: 'red label', type: DraggedElementType.text, value: 'red' }, 'column1': { name: 'purple label', type: DraggedElementType.text, value: 'purple' } }, // row 1
+          { 'column0': { name: 'yellow label', type: DraggedElementType.text, value: 'yellow' }, 'column1': { name: 'pink label', type: DraggedElementType.text, value: 'pink' } }, // row 2
+        ]
+      },
+      {
+        settings: { id: 985, title: 'Places' },
+        data: [
+          { 'column0': { name: 'nyc label', type: DraggedElementType.text, value: 'NYC' }, 'column1': { name: 'spain label', type: DraggedElementType.text, value: 'Spain' } }, // row 0
+          { 'column0': { name: 'la label', type: DraggedElementType.text, value: 'Los Angeles' }, 'column1': { name: 'greece label', type: DraggedElementType.text, value: 'Greece' } }, // row 1
+          { 'column0': { name: 'london label', type: DraggedElementType.text, value: 'London' }, 'column1': { name: 'banff label', type: DraggedElementType.text, value: 'Banff' } }, // row 2
+        ]
+      }
     ]
   }
 }
