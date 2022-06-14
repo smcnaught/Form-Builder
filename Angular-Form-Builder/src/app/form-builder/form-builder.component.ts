@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 
-import { IItemUpdatedFromSettingsInfo } from './settings/settings.component';
-import { DraggedElementType, IDragBetweenSectionsData, IItem, ISection } from './shared/types';
+import { IItemUpdatedFromSettingsInfo } from './settings-panel/item-settings/item-settings.component';
+import { DraggedElementType, IDragBetweenSectionsData, IItem, ISection, ISectionSettings } from './shared/types';
 
 @Component({
   selector: 'form-builder',
@@ -11,6 +11,7 @@ import { DraggedElementType, IDragBetweenSectionsData, IItem, ISection } from '.
 })
 export class FormBuilderComponent implements OnInit {
   public selectedItem: IItem;
+  public selectedSectionSettings: ISectionSettings;
   public selectedItemChanged: Subject<IItemUpdatedFromSettingsInfo> = new Subject();
   public userDraggingSection: Subject<boolean> = new Subject();
   public allSections: Array<ISection>;
@@ -26,16 +27,23 @@ export class FormBuilderComponent implements OnInit {
     this.setSectionData();
   }
 
+  public get DraggedElementType() {
+    return DraggedElementType;
+  }
+
   public onSelectedItemChange(item: IItem): void {
     this.selectedItem = item;
+    this.selectedSectionSettings = null;
   }
 
   public onUpdateSelectedItem(itemInfo: IItemUpdatedFromSettingsInfo): void {
     this.selectedItemChanged.next(itemInfo);
   }
 
-  public get DraggedElementType() {
-    return DraggedElementType;
+  public onUpdateSelectedSection(updatedSectionSettings: ISectionSettings): void {
+    const indexOfSection = this.getIndexOfSection(updatedSectionSettings.id);
+    this.allSections[indexOfSection].settings = updatedSectionSettings;
+    this.allSections = JSON.parse(JSON.stringify(this.allSections)); // have to deep clone or it doesn't notice the change.
   }
 
   public onDragNewItemStart(elementType: DraggedElementType): void {
@@ -67,6 +75,14 @@ export class FormBuilderComponent implements OnInit {
     const sectionToMove = this.allSections[this.moveSectionInfo.draggedSectionIndex];
     this.allSections.splice(this.moveSectionInfo.draggedSectionIndex, 1);
     this.allSections.splice(this.moveSectionInfo.moveToSectionIndex, 0, sectionToMove);
+  }
+
+  public onSelectSection(sectionID: number, event: MouseEvent): void {
+    // check that the user has clicked on the section and not on an item in the section.
+    if (event.target === event.currentTarget) {
+      this.selectedSectionSettings = this.allSections[sectionID].settings;
+      this.selectedItem = null;
+    }
   }
 
   public setDataForDragBetweenSections(dragInfo: IDragBetweenSectionsData): void {

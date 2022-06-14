@@ -9,18 +9,20 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
-import { FormBuilderComponent } from './form-builder.component';
-import { SectionComponent } from './section/section.component';
-import { SettingsComponent } from './settings/settings.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatButtonModule } from '@angular/material/button';
+
+import { SectionSettingsComponent } from './settings-panel/section-settings/section-settings.component';
+import { ItemSettingsComponent } from './settings-panel/item-settings/item-settings.component';
+import { FormBuilderComponent } from './form-builder.component';
+import { SectionComponent } from './section/section.component';
 
 @NgModule({
   declarations: [
     FormBuilderComponent,
     SectionComponent,
-    SettingsComponent
+    ItemSettingsComponent,
+    SectionSettingsComponent
   ],
   imports: [
     BrowserModule,

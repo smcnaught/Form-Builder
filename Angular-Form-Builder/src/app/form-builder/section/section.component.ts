@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } 
 import { MatTable } from '@angular/material/table';
 import { Subject, Subscription } from 'rxjs';
 
-import { IItemUpdatedFromSettingsInfo } from '../settings/settings.component';
+import { IItemUpdatedFromSettingsInfo } from '../settings-panel/item-settings/item-settings.component';
 import {
   DraggedElementType,
   INewRow,
