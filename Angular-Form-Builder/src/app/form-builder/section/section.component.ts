@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } 
 import { MatTable } from '@angular/material/table';
 import { Subject, Subscription } from 'rxjs';
 
-import { IItemUpdatedFromSettingsInfo } from '../settings/settings.component';
+import { IItemUpdatedFromSettingsInfo } from '../settings-panel/item-settings/item-settings.component';
 import {
   DraggedElementType,
   INewRow,
@@ -27,6 +27,7 @@ export class SectionComponent implements OnInit, OnDestroy {
   @Input() section: ISection;
   @Input() typeOfDraggedElement: DraggedElementType;
   @Input() itemChangedFromSettings: Subject<IItemUpdatedFromSettingsInfo>;
+  @Input() userDraggingSection: Subject<boolean>;
   @Input() itemMovedFromOtherSection: IItem = null; // needs to be set to null
   @Input() showDropZones: boolean;
   @Output() toggleDropZone = new EventEmitter<boolean>();
@@ -45,6 +46,7 @@ export class SectionComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     this.setupPage();
     this.setupSettingsListener();
+    this.setupUserDraggingSectionListener();
   }
 
   public ngOnDestroy(): void {
@@ -54,28 +56,30 @@ export class SectionComponent implements OnInit, OnDestroy {
   public get draggedElementEnum() { return DraggedElementType };
 
   public onDrop(event: DragEvent, movingToRow: boolean, movingToEmptySpace?: boolean, movingToLeftOrRight?: boolean): void {
-    this.toggleClass(event)
-    this.toggleDropZone.emit(false);
-    const movingItemFromThisSection = this.dragInfo.draggedItemColumn !== null && this.dragInfo.draggedItemColumn !== null;
-    const movingFromDifferentSection = !movingItemFromThisSection && this.itemMovedFromOtherSection !== null;
-    const addingColumnToFarLeftOrFarRight = !this.displayedColumns.includes('column'+this.dragInfo.moveToColumn);
-    const movingItemFromThisSectionToNewColumn = !addingColumnToFarLeftOrFarRight && movingToLeftOrRight;
-
-    if (addingColumnToFarLeftOrFarRight) {
-      const addingToLeft = this.dragInfo.moveToColumn === -1;
-      this.addColumn(addingToLeft, !addingToLeft);
+    if (!this.dragInfo.draggedItemIsSection) {
+      this.toggleClass(event)
+      this.toggleDropZone.emit(false);
+      const movingItemFromThisSection = this.dragInfo.draggedItemColumn !== null && this.dragInfo.draggedItemColumn !== null;
+      const movingFromDifferentSection = !movingItemFromThisSection && this.itemMovedFromOtherSection !== null;
+      const addingColumnToFarLeftOrFarRight = !this.displayedColumns.includes('column'+this.dragInfo.moveToColumn);
+      const movingItemFromThisSectionToNewColumn = !addingColumnToFarLeftOrFarRight && movingToLeftOrRight;
+  
+      if (addingColumnToFarLeftOrFarRight) {
+        const addingToLeft = this.dragInfo.moveToColumn === -1;
+        this.addColumn(addingToLeft, !addingToLeft);
+      }
+      else if (movingItemFromThisSectionToNewColumn) {
+        this.addColumn(false, false, this.dragInfo.moveToColumn);
+        this.dragInfo.draggedItemColumn++;
+      }
+  
+      if (movingItemFromThisSection || movingItemFromThisSectionToNewColumn) this.moveExistingItem();
+      else if (movingFromDifferentSection) this.addItemFromOtherSection(movingToEmptySpace);
+      else this.addNewItem(movingToEmptySpace, movingToRow, addingColumnToFarLeftOrFarRight);
+      this.resetDragInfo();
+      this.checkDeleteEmptyRows();
+      this.checkDeleteEmptyColumns();
     }
-    else if (movingItemFromThisSectionToNewColumn) {
-      this.addColumn(false, false, this.dragInfo.moveToColumn);
-      this.dragInfo.draggedItemColumn++;
-    }
-
-    if (movingItemFromThisSection || movingItemFromThisSectionToNewColumn) this.moveExistingItem();
-    else if (movingFromDifferentSection) this.addItemFromOtherSection(movingToEmptySpace);
-    else this.addNewItem(movingToEmptySpace, movingToRow, addingColumnToFarLeftOrFarRight);
-    this.resetDragInfo();
-    this.checkDeleteEmptyRows();
-    this.checkDeleteEmptyColumns();
   }
 
   public onDragStart(event: DragEvent, columnIndex: number, rowIndex: number): void {
@@ -91,6 +95,7 @@ export class SectionComponent implements OnInit, OnDestroy {
       }
 
       this.dragBetweenSections.emit(dragBetweenSectionsData);
+      this.dragInfo.draggedItemIsSection = false;
     }
   }
 
@@ -155,7 +160,7 @@ export class SectionComponent implements OnInit, OnDestroy {
 
   private removeItem(removeInfo: IRemoveItem): void {
     if (this.sectionSettings.id === removeInfo.sectionID) {
-      this.sectionData[removeInfo.row]['column'+removeInfo.column] = { name: '', type: DraggedElementType.none, value: '' };
+      this.sectionData[removeInfo.row]['column'+removeInfo.column] = { name: '', type: DraggedElementType.none, value: '', settings: { required: false } };
     }
   }
 
@@ -221,7 +226,7 @@ export class SectionComponent implements OnInit, OnDestroy {
     else {
       let newRow: ISectionData = {};
       this.displayedColumns.forEach((column: string) => {
-        newRow[column] = { type: DraggedElementType.none, value: '', name: '' }
+        newRow[column] = { type: DraggedElementType.none, value: '', name: '', settings: { required: false } }
       })
 
       newRow['column' + this.dragInfo.moveToColumn] = this.itemMovedFromOtherSection;
@@ -236,13 +241,13 @@ export class SectionComponent implements OnInit, OnDestroy {
   private addNewItem(movingToEmptySpace: boolean, movingToNewRow: boolean, columnAlreadyAdded: boolean): void {
     let newItem: IItem;
     if (this.typeOfDraggedElement === DraggedElementType.text || this.typeOfDraggedElement === DraggedElementType.number || this.typeOfDraggedElement === DraggedElementType.multimedia) {
-      newItem = { type: this.typeOfDraggedElement, value: '', name: '' }
+      newItem = { type: this.typeOfDraggedElement, value: '', name: '', settings: { required: false } }
     }
     else if (this.typeOfDraggedElement === DraggedElementType.dateTime) {
-      newItem = { type: this.typeOfDraggedElement, value: { date: '', time: '' }, name: '' }
+      newItem = { type: this.typeOfDraggedElement, value: { date: '', time: '' }, name: '', settings: { required: false } }
     }
     else if (this.typeOfDraggedElement === DraggedElementType.multiSelect || this.typeOfDraggedElement === DraggedElementType.singleSelect) {
-      newItem = { type: this.typeOfDraggedElement, value: [], name: '' }
+      newItem = { type: this.typeOfDraggedElement, value: [], name: '', settings: { required: false } }
     }
 
     if (movingToEmptySpace) {
@@ -251,7 +256,7 @@ export class SectionComponent implements OnInit, OnDestroy {
     else if (movingToNewRow) {
       let newRow: ISectionData = {};
       this.displayedColumns.forEach((columnName: string) => {
-        newRow[columnName] = { type: DraggedElementType.none, value: '', name: '' }
+        newRow[columnName] = { type: DraggedElementType.none, value: '', name: '', settings: { required: false } }
       })
 
       newRow['column' + this.dragInfo.moveToColumn] = newItem;
@@ -279,7 +284,7 @@ export class SectionComponent implements OnInit, OnDestroy {
           else if (columnNumber >= insertNewAt) newRow['column'+ newColumnNumber] = this.sectionData[i][column];
         })
 
-        newRow['column'+insertNewAt] = { type: DraggedElementType.none, value: '', name: '' };
+        newRow['column'+insertNewAt] = { type: DraggedElementType.none, value: '', name: '', settings: { required: false } };
         newSectionData.push(newRow);
       }
 
@@ -297,7 +302,7 @@ export class SectionComponent implements OnInit, OnDestroy {
           newRow['column'+newColumnNumber] = this.sectionData[i][column];
         })
 
-        newRow['column0'] = { name: '', type: DraggedElementType.none, value: '' };
+        newRow['column0'] = { name: '', type: DraggedElementType.none, value: '', settings: { required: false } };
         newSectionData.push(newRow);
       }
 
@@ -309,7 +314,7 @@ export class SectionComponent implements OnInit, OnDestroy {
     else if (addingToFarRight) {
       const columnName: string = 'column' + this.dragInfo.moveToColumn;
       this.sectionData.forEach((row: ISectionData) => {
-        row[columnName] = { name: '', type: DraggedElementType.none, value: '' };
+        row[columnName] = { name: '', type: DraggedElementType.none, value: '', settings: { required: false } };
       })
 
       this.displayedColumns.push(columnName);
@@ -354,7 +359,7 @@ export class SectionComponent implements OnInit, OnDestroy {
     let row: ISectionData = {};
     for (let i = 0; i < newRowInfo.totalColumns; i++) {
       if (i === newRowInfo.columnWithData) row['column'+i] = newRowInfo.columnData;
-      else row['column'+i] = { type: DraggedElementType.none, value: null, name: null };
+      else row['column'+i] = { type: DraggedElementType.none, value: null, name: null, settings: { required: false } };
     }
 
     this.sectionData.push(row);
@@ -413,6 +418,7 @@ export class SectionComponent implements OnInit, OnDestroy {
       draggedItemRow: null,
       moveToColumn: null,
       moveToRow: null,
+      draggedItemIsSection: false
     }
   }
 
@@ -429,5 +435,13 @@ export class SectionComponent implements OnInit, OnDestroy {
     })
 
     this.subscriptions.add(settingsSub);
+  }
+
+  private setupUserDraggingSectionListener(): void {
+    const draggingSectionSub = this.userDraggingSection.subscribe((isDraggingSection: boolean) => {
+      this.dragInfo.draggedItemIsSection = isDraggingSection;
+    })
+
+    this.subscriptions.add(draggingSectionSub);
   }
 }

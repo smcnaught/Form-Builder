@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 
-import { DraggedElementType, IItem } from "../shared/types";
+import { DraggedElementType, IItem } from "../../shared/types";
 
 export interface IItemUpdatedFromSettingsInfo {
   item: IItem,
@@ -11,11 +11,11 @@ export interface IItemUpdatedFromSettingsInfo {
 }
 
 @Component({
-  selector: 'settings',
-  templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.scss']
+  selector: 'item-settings',
+  templateUrl: './item-settings.component.html',
+  styleUrls: ['./item-settings.component.scss']
 })
-export class SettingsComponent {
+export class ItemSettingsComponent {
   @Input() item: IItem;
   @Output() updatedItem = new EventEmitter<IItemUpdatedFromSettingsInfo>();
 

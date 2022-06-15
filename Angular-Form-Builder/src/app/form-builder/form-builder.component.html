@@ -43,11 +43,13 @@
         draggable="true"
         (dragstart)="onDragSection(i)"
         (dragend)="onDragSectionEnd()"
+        (click)="onSelectSection(i, $event)"
         (toggleDropZone)="toggleDropZone($event)"
         [showDropZones]="showItemDropZones | async"
         [section]="section"
         [typeOfDraggedElement]="draggedElementType"
         [itemChangedFromSettings]="selectedItemChanged"
+        [userDraggingSection]="userDraggingSection"
         [itemMovedFromOtherSection]="itemToAddToOtherSection"
         (dragBetweenSections)="setDataForDragBetweenSections($event)"
         (selectedItem)="onSelectedItemChange($event)"
@@ -66,9 +68,15 @@
     </div>
   </div>
 
-  <settings
+  <item-settings
     class="panel-widths"
     [item]="selectedItem"
     (updatedItem)="onUpdateSelectedItem($event)">
-  </settings>
+  </item-settings>
+
+  <section-settings
+    class="panel-widths"
+    [sectionSettings]="selectedSectionSettings"
+    (updatedSection)="onUpdateSelectedSection($event)">
+  </section-settings>
 </div>

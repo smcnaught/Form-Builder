@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 
-import { IItemUpdatedFromSettingsInfo } from './settings/settings.component';
-import { DraggedElementType, IDragBetweenSectionsData, IItem, ISection } from './shared/types';
+import { IItemUpdatedFromSettingsInfo } from './settings-panel/item-settings/item-settings.component';
+import { DraggedElementType, IDragBetweenSectionsData, IItem, ISection, ISectionSettings } from './shared/types';
 
 @Component({
   selector: 'form-builder',
@@ -11,7 +11,9 @@ import { DraggedElementType, IDragBetweenSectionsData, IItem, ISection } from '.
 })
 export class FormBuilderComponent implements OnInit {
   public selectedItem: IItem;
+  public selectedSectionSettings: ISectionSettings;
   public selectedItemChanged: Subject<IItemUpdatedFromSettingsInfo> = new Subject();
+  public userDraggingSection: Subject<boolean> = new Subject();
   public allSections: Array<ISection>;
   public itemToAddToOtherSection: IItem = null; // needs to be set to null
   public draggedElementType: DraggedElementType;
@@ -25,16 +27,23 @@ export class FormBuilderComponent implements OnInit {
     this.setSectionData();
   }
 
+  public get DraggedElementType() {
+    return DraggedElementType;
+  }
+
   public onSelectedItemChange(item: IItem): void {
     this.selectedItem = item;
+    this.selectedSectionSettings = null;
   }
 
   public onUpdateSelectedItem(itemInfo: IItemUpdatedFromSettingsInfo): void {
     this.selectedItemChanged.next(itemInfo);
   }
 
-  public get DraggedElementType() {
-    return DraggedElementType;
+  public onUpdateSelectedSection(updatedSectionSettings: ISectionSettings): void {
+    const indexOfSection = this.getIndexOfSection(updatedSectionSettings.id);
+    this.allSections[indexOfSection].settings = updatedSectionSettings;
+    this.allSections = JSON.parse(JSON.stringify(this.allSections)); // have to deep clone or it doesn't notice the change.
   }
 
   public onDragNewItemStart(elementType: DraggedElementType): void {
@@ -45,6 +54,7 @@ export class FormBuilderComponent implements OnInit {
   public onDragSection(draggedIndex: number): void {
     this.showSectionDropZones = true;
     this.moveSectionInfo.draggedSectionIndex = draggedIndex;
+    this.userDraggingSection.next(true);
   }
 
   public onDragSectionEnd(): void {
@@ -67,6 +77,14 @@ export class FormBuilderComponent implements OnInit {
     this.allSections.splice(this.moveSectionInfo.moveToSectionIndex, 0, sectionToMove);
   }
 
+  public onSelectSection(sectionID: number, event: MouseEvent): void {
+    // check that the user has clicked on the section and not on an item in the section.
+    if (event.target === event.currentTarget) {
+      this.selectedSectionSettings = this.allSections[sectionID].settings;
+      this.selectedItem = null;
+    }
+  }
+
   public setDataForDragBetweenSections(dragInfo: IDragBetweenSectionsData): void {
     // add item to different section
     const sectionIndex = this.getIndexOfSection(dragInfo.fromSection);
@@ -82,7 +100,8 @@ export class FormBuilderComponent implements OnInit {
       this.allSections[sectionIndex].data[this.removeItemInfo.draggedRow]['column'+this.removeItemInfo.draggedColumn] = {
         name: '',
         type: DraggedElementType.none,
-        value: ''
+        value: '',
+        settings: { required: false }
       }
     }
 
@@ -132,25 +151,25 @@ export class FormBuilderComponent implements OnInit {
       {
         settings: { id: 150, title: 'Animals' },
         data: [
-          { 'column0': { name: 'name-pup-count', type: DraggedElementType.number, value: 512 }, 'column1': { name: 'name-bird', type: DraggedElementType.text, value: 'bird' } }, // row 0
-          { 'column0': { name: 'name-date-time', type: DraggedElementType.dateTime, value: { date: '2018-07-22', time: '13:30' } }, 'column1': { name: 'name-monkey', type: DraggedElementType.text, value: 'monkey' } }, // row 1
-          { 'column0': { name: 'name-multiSelect', type: DraggedElementType.multiSelect, value: [{ value: 'one', checked: false }, { value: 'two', checked: false }, { value: 'three', checked: false }] }, 'column1': { name: 'name-singleSelect', type: DraggedElementType.singleSelect, value: [{ value: 'one', checked: false }, { value: 'two', checked: false }, { value: 'three', checked: false }] } }, // row 2
+          { 'column0': { name: 'name-pup-count', type: DraggedElementType.number, value: 512, settings: { required: true } }, 'column1': { name: 'name-bird', type: DraggedElementType.text, value: 'bird', settings: { required: true } } }, // row 0
+          { 'column0': { name: 'name-date-time', type: DraggedElementType.dateTime, value: { date: '2018-07-22', time: '13:30' }, settings: { required: true } }, 'column1': { name: 'name-monkey', type: DraggedElementType.text, value: 'monkey', settings: { required: true } } }, // row 1
+          { 'column0': { name: 'name-multiSelect', type: DraggedElementType.multiSelect, value: [{ value: 'one', checked: false }, { value: 'two', checked: false }, { value: 'three', checked: false }], settings: { required: true } }, 'column1': { name: 'name-singleSelect', type: DraggedElementType.singleSelect, value: [{ value: 'one', checked: false }, { value: 'two', checked: false }, { value: 'three', checked: false }], settings: { required: true } } }, // row 2
         ],
       },
       {
         settings: { id: 201, title: 'Colors' },
         data: [
-          { 'column0': { name: 'blue label', type: DraggedElementType.text, value: 'blue' }, 'column1': { name: 'orange label', type: DraggedElementType.text, value: 'orange' } }, // row 0
-          { 'column0': { name: 'red label', type: DraggedElementType.text, value: 'red' }, 'column1': { name: 'purple label', type: DraggedElementType.text, value: 'purple' } }, // row 1
-          { 'column0': { name: 'yellow label', type: DraggedElementType.text, value: 'yellow' }, 'column1': { name: 'pink label', type: DraggedElementType.text, value: 'pink' } }, // row 2
+          { 'column0': { name: 'blue label', type: DraggedElementType.text, value: 'blue', settings: { required: true } }, 'column1': { name: 'orange label', type: DraggedElementType.text, value: 'orange', settings: { required: true } } }, // row 0
+          { 'column0': { name: 'red label', type: DraggedElementType.text, value: 'red', settings: { required: true } }, 'column1': { name: 'purple label', type: DraggedElementType.text, value: 'purple', settings: { required: true } } }, // row 1
+          { 'column0': { name: 'yellow label', type: DraggedElementType.text, value: 'yellow', settings: { required: true } }, 'column1': { name: 'pink label', type: DraggedElementType.text, value: 'pink', settings: { required: true } } }, // row 2
         ]
       },
       {
         settings: { id: 985, title: 'Places' },
         data: [
-          { 'column0': { name: 'nyc label', type: DraggedElementType.text, value: 'NYC' }, 'column1': { name: 'spain label', type: DraggedElementType.text, value: 'Spain' } }, // row 0
-          { 'column0': { name: 'la label', type: DraggedElementType.text, value: 'Los Angeles' }, 'column1': { name: 'greece label', type: DraggedElementType.text, value: 'Greece' } }, // row 1
-          { 'column0': { name: 'london label', type: DraggedElementType.text, value: 'London' }, 'column1': { name: 'banff label', type: DraggedElementType.text, value: 'Banff' } }, // row 2
+          { 'column0': { name: 'nyc label', type: DraggedElementType.text, value: 'NYC', settings: { required: true } }, 'column1': { name: 'spain label', type: DraggedElementType.text, value: 'Spain', settings: { required: true } } }, // row 0
+          { 'column0': { name: 'la label', type: DraggedElementType.text, value: 'Los Angeles', settings: { required: true } }, 'column1': { name: 'greece label', type: DraggedElementType.text, value: 'Greece', settings: { required: true } } }, // row 1
+          { 'column0': { name: 'london label', type: DraggedElementType.text, value: 'London', settings: { required: true } }, 'column1': { name: 'banff label', type: DraggedElementType.text, value: 'Banff', settings: { required: true } } }, // row 2
         ]
       }
     ]

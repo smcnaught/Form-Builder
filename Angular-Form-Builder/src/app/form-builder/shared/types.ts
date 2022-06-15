@@ -2,6 +2,11 @@ export interface IItem {
   name: string;
   type: DraggedElementType,
   value: FormItems.TextInput | FormItems.NumberInput |  FormItems.IDateTimeInput | FormItems.ISelectInput[] | FormItems.MultimediaInput;
+  settings: IItemSettings;
+}
+
+export interface IItemSettings {
+  required: boolean;
 }
 
 export interface IRemoveItem {
@@ -27,6 +32,7 @@ export interface ISwitchInfo {
 }
 
 export interface IDragInfo {
+  draggedItemIsSection: boolean;
   draggedItemColumn: number;
   draggedItemRow: number;
   moveToColumn: number;
