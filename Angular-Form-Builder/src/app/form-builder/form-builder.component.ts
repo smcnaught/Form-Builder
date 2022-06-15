@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 
 import { IItemUpdatedFromSettingsInfo } from './settings-panel/item-settings/item-settings.component';
+import { IFormBuilderConfig } from './shared/form-builder-config';
 import { DraggedElementType, IDragBetweenSectionsData, IItem, ISection, ISectionSettings } from './shared/types';
 
 @Component({
@@ -10,6 +11,7 @@ import { DraggedElementType, IDragBetweenSectionsData, IItem, ISection, ISection
   styleUrls: ['./form-builder.component.scss']
 })
 export class FormBuilderComponent implements OnInit {
+  @Input() config: IFormBuilderConfig;
   public selectedItem: IItem;
   public selectedSectionSettings: ISectionSettings;
   public selectedItemChanged: Subject<IItemUpdatedFromSettingsInfo> = new Subject();
@@ -24,6 +26,7 @@ export class FormBuilderComponent implements OnInit {
   private moveSectionInfo = { draggedSectionIndex: null, moveToSectionIndex: null };
 
   public ngOnInit(): void {
+    this.setDefaultConfigSettings();
     this.setSectionData();
   }
 
@@ -173,5 +176,82 @@ export class FormBuilderComponent implements OnInit {
         ]
       }
     ]
+  }
+
+  private setDefaultConfigSettings(): void {
+    const defaultConfigSettings: IFormBuilderConfig = this.getDefaultConfigSettings(); 
+    let updatedUserConfigWithDefaults = JSON.parse(JSON.stringify(defaultConfigSettings));
+
+    const loopThroughConfig = (obj: IFormBuilderConfig, path: string[], atRoot?: boolean) => {
+      Object.entries(obj).forEach(([defaultKey, defaultValue]) => {
+        if (atRoot) path = [];
+        if (typeof defaultValue === 'object') {
+          if (path && path.length > 0) path = [...path, defaultKey];
+          else path = [defaultKey];
+          loopThroughConfig(defaultValue, path, false);
+        }
+        else {
+          // overwrite newSetting values with custom settings
+          let myCustomValue = JSON.parse(JSON.stringify(this.config));
+            path.forEach((keyInPath) => {
+              if (myCustomValue?.hasOwnProperty(keyInPath)) myCustomValue = myCustomValue[keyInPath];
+              else myCustomValue = null;
+            });   
+    
+          if (myCustomValue) myCustomValue = myCustomValue[defaultKey]; // requires separate if check
+          if (myCustomValue !== undefined && myCustomValue !== null) {
+            if (path.length > 0) {   
+              if (path.length === 1) updatedUserConfigWithDefaults[path[0]][defaultKey] = myCustomValue;
+              else if (path.length === 2) updatedUserConfigWithDefaults[path[0]][path[1]][defaultKey] = myCustomValue;
+              else if (path.length === 3) updatedUserConfigWithDefaults[path[0]][path[1]][path[2]][defaultKey] = myCustomValue;
+              else console.log("need to add more")
+            }
+            else {
+              updatedUserConfigWithDefaults[defaultKey] = myCustomValue;
+            }
+          }        
+        }
+      })
+    }
+
+    if (!this.config) this.config = defaultConfigSettings;
+    else {
+      loopThroughConfig(defaultConfigSettings, [], true);
+      this.config = updatedUserConfigWithDefaults;
+    }
+  }
+
+  private getDefaultConfigSettings(): IFormBuilderConfig {
+    const defaultConfigSettings: IFormBuilderConfig = {
+      draggableElements: {
+        textTitle: 'Text',
+        textIcon: 'abc',
+        showText: true,
+
+        numberTitle: 'Number',
+        numberIcon: '123',
+        showNumber: true,
+
+        dateAndTimeTitle: 'Date & Time',
+        dateAndTimeIcon: 'today',
+        showDateAndTime: true,
+
+        multiSelectTitle: 'Multi Select',
+        multiSelectIcon: 'list',
+        showMultiSelect: true,
+
+        singleSelectTitle: 'Single Select',
+        singleSelectIcon: 'list',
+        showSingleSelect: true,
+
+        mediaAndFilesTitle: 'Media & Files',
+        mediaAndFilesIcon: 'photo_camera',
+        showMediaAndFiles: true,
+      },
+      showSectionSettingsPane: true,
+      showItemSettingsPane: true
+    }
+
+    return defaultConfigSettings;
   }
 }
