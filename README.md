@@ -57,8 +57,7 @@ The complete IFormBuilderConfig looks like this:
 
 The `draggableElements` property contains settings for each of the new elements the user can add to the page. 
 <!-- [Draggable Elements](./../draggable-elements.jpg) -->
-![Draggable Elements](./../draggable-elements.jpg?raw=true "Draggable Elements")
-
+![Draggable Elements](https://raw.githubusercontent.com/smcnaught/Form-Builder/main/draggable-elements.jpg)
 
 The `showSectionSettingsPane` determines whether the section settings pane displays when the user clicks on a section.
 The `showItemSettingsPane` determines whether the item settings pane displays when the user clicks on an item within the form.
