@@ -1,29 +1,71 @@
 <div fxLayoutAlign="start start" class="w-100">
   <div fxLayout="column" fxLayoutAlign="start center" class="panel-widths">
     <h4 class="w-100">Item Types</h4>
-    <div draggable="true" class="draggable-item-type" fxLayout="row" fxLayoutAlign="start center" (dragend)="toggleDropZone(false)" (dragstart)="onDragNewItemStart(DraggedElementType.text)">
-      <mat-icon class="icon-style">abc</mat-icon>
-      <p class="text-font m-0">Text</p>
+    <div
+      *ngIf="config.draggableElements.showText"
+      draggable="true"
+      class="draggable-item-type"
+      fxLayout="row"
+      fxLayoutAlign="start center"
+      (dragend)="toggleDropZone(false)"
+      (dragstart)="onDragNewItemStart(DraggedElementType.text)">
+      <mat-icon class="icon-style">{{ config.draggableElements.textIcon }}</mat-icon>
+      <p class="text-font m-0">{{ config.draggableElements.textTitle }}</p>
     </div>
-    <div draggable="true" class="draggable-item-type" fxLayout="row" fxLayoutAlign="start center" (dragend)="toggleDropZone(false)" (dragstart)="onDragNewItemStart(DraggedElementType.number)">
-      <mat-icon class="icon-style">123</mat-icon>
-      <p class="text-font m-0">Number</p>
+    <div
+      *ngIf="config.draggableElements.showNumber"
+      draggable="true"
+      class="draggable-item-type"
+      fxLayout="row"
+      fxLayoutAlign="start center"
+      (dragend)="toggleDropZone(false)"
+      (dragstart)="onDragNewItemStart(DraggedElementType.number)">
+      <mat-icon class="icon-style">{{ config.draggableElements.numberIcon }}</mat-icon>
+      <p class="text-font m-0">{{ config.draggableElements.numberTitle }}</p>
     </div>
-    <div draggable="true" class="draggable-item-type" fxLayout="row" fxLayoutAlign="start center" (dragend)="toggleDropZone(false)" (dragstart)="onDragNewItemStart(DraggedElementType.dateTime)">
-      <mat-icon class="icon-style">today</mat-icon>
-      <p class="text-font m-0">Date & Time</p>
+    <div
+      *ngIf="config.draggableElements.showDateAndTime"
+      draggable="true"
+      class="draggable-item-type"
+      fxLayout="row"
+      fxLayoutAlign="start center"
+      (dragend)="toggleDropZone(false)"
+      (dragstart)="onDragNewItemStart(DraggedElementType.dateTime)">
+      <mat-icon class="icon-style">{{ config.draggableElements.dateAndTimeIcon }}</mat-icon>
+      <p class="text-font m-0">{{ config.draggableElements.dateAndTimeTitle }}</p>
     </div>
-    <div draggable="true" class="draggable-item-type" fxLayout="row" fxLayoutAlign="start center" (dragend)="toggleDropZone(false)" (dragstart)="onDragNewItemStart(DraggedElementType.multiSelect)">
-      <mat-icon class="icon-style">list</mat-icon>
-      <p class="text-font m-0">Multi Select</p>
+    <div
+      *ngIf="config.draggableElements.showMultiSelect"
+      draggable="true"
+      class="draggable-item-type"
+      fxLayout="row"
+      fxLayoutAlign="start center"
+      (dragend)="toggleDropZone(false)"
+      (dragstart)="onDragNewItemStart(DraggedElementType.multiSelect)">
+      <mat-icon class="icon-style">{{ config.draggableElements.multiSelectIcon }}</mat-icon>
+      <p class="text-font m-0">{{ config.draggableElements.multiSelectTitle }}</p>
     </div>
-    <div draggable="true" class="draggable-item-type" fxLayout="row" fxLayoutAlign="start center" (dragend)="toggleDropZone(false)" (dragstart)="onDragNewItemStart(DraggedElementType.singleSelect)">
-      <mat-icon class="icon-style">list</mat-icon>
-      <p class="text-font m-0">Single Select</p>
+    <div
+      *ngIf="config.draggableElements.showSingleSelect"
+      draggable="true"
+      class="draggable-item-type"
+      fxLayout="row"
+      fxLayoutAlign="start center"
+      (dragend)="toggleDropZone(false)"
+      (dragstart)="onDragNewItemStart(DraggedElementType.singleSelect)">
+      <mat-icon class="icon-style">{{ config.draggableElements.singleSelectIcon }}</mat-icon>
+      <p class="text-font m-0">{{ config.draggableElements.singleSelectTitle }}</p>
     </div>
-    <div draggable="true" class="draggable-item-type" fxLayout="row" fxLayoutAlign="start center" (dragend)="toggleDropZone(false)" (dragstart)="onDragNewItemStart(DraggedElementType.multimedia)">
-      <mat-icon class="icon-style">photo_camera</mat-icon>
-      <p class="text-font m-0">Media & Files</p>
+    <div
+      *ngIf="config.draggableElements.showMediaAndFiles"
+      draggable="true"
+      class="draggable-item-type"
+      fxLayout="row"
+      fxLayoutAlign="start center"
+      (dragend)="toggleDropZone(false)"
+      (dragstart)="onDragNewItemStart(DraggedElementType.multimedia)">
+      <mat-icon class="icon-style">{{ config.draggableElements.mediaAndFilesIcon }}</mat-icon>
+      <p class="text-font m-0">{{ config.draggableElements.mediaAndFilesTitle }}</p>
     </div>
   </div>
 
@@ -69,12 +111,14 @@
   </div>
 
   <item-settings
+    *ngIf="config.showItemSettingsPane"
     class="panel-widths"
     [item]="selectedItem"
     (updatedItem)="onUpdateSelectedItem($event)">
   </item-settings>
 
   <section-settings
+    *ngIf="config.showSectionSettingsPane"
     class="panel-widths"
     [sectionSettings]="selectedSectionSettings"
     (updatedSection)="onUpdateSelectedSection($event)">
