@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 
+import { IItemSettingsPaneConfig } from "../../shared/form-builder-config";
 import { DraggedElementType, IItem } from "../../shared/types";
 
 export interface IItemUpdatedFromSettingsInfo {
@@ -17,6 +18,7 @@ export interface IItemUpdatedFromSettingsInfo {
 })
 export class ItemSettingsComponent {
   @Input() item: IItem;
+  @Input() config: IItemSettingsPaneConfig;
   @Output() updatedItem = new EventEmitter<IItemUpdatedFromSettingsInfo>();
 
   public get DraggedElementType() {

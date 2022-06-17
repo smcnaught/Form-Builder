@@ -224,32 +224,53 @@ export class FormBuilderComponent implements OnInit {
   private getDefaultConfigSettings(): IFormBuilderConfig {
     const defaultConfigSettings: IFormBuilderConfig = {
       draggableElements: {
-        textTitle: 'Text',
+        textLabel: 'Text',
         textIcon: 'abc',
         showText: true,
 
-        numberTitle: 'Number',
+        numberLabel: 'Number',
         numberIcon: '123',
         showNumber: true,
 
-        dateAndTimeTitle: 'Date & Time',
+        dateAndTimeLabel: 'Date & Time',
         dateAndTimeIcon: 'today',
         showDateAndTime: true,
 
-        multiSelectTitle: 'Multi Select',
+        multiSelectLabel: 'Multi Select',
         multiSelectIcon: 'list',
         showMultiSelect: true,
 
-        singleSelectTitle: 'Single Select',
+        singleSelectLabel: 'Single Select',
         singleSelectIcon: 'list',
         showSingleSelect: true,
 
-        mediaAndFilesTitle: 'Media & Files',
+        mediaAndFilesLabel: 'Media & Files',
         mediaAndFilesIcon: 'photo_camera',
         showMediaAndFiles: true,
       },
       showSectionSettingsPane: true,
-      showItemSettingsPane: true
+      sectionSettingsPane: {
+        heading: 'SECTION SETTINGS:',
+        sectionTitleLabel: 'Section Title:',
+        sectionTitlePlaceholder: 'Section Title'
+      },
+      showItemSettingsPane: true,
+      itemSettingsPane: {
+        heading: 'ITEM SETTINGS:',
+        itemNameLabel: 'Item Name:',
+        itemNamePlaceholder: 'Item Name',
+        itemRequiredLabel: 'Item Required:',
+        itemValueLabel: 'Item Value:',
+        itemValuePlaceholder: 'Item Value',
+        dateLabel: 'Date:',
+        timeLabel: 'Time:',
+        multiSelectLabel: 'Options:',
+        multiSelectPlaceholder: 'Enter Option',
+        singleSelectLabel: 'Options:',
+        singleSelectPlaceholder: 'Enter Option',
+        fileLabel: 'File:',
+        chooseFileButtonText: 'Choose File',
+      }
     }
 
     return defaultConfigSettings;
