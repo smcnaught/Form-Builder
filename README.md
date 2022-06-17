@@ -72,11 +72,11 @@ All the config properties are optional, but here is a complete example of how to
 ## Top Level Config Settings: 
 | Input         | Type          | Default       | Required      | Description   |
 | ------------- | ------------- | ------------- | ------------- | ------------- |
-| draggableElements | [IDraggableElementsConfig](#IDraggableElementsConfig) | See IDraggableElementsConfig below. | no | Configure new draggable elements. |
+| draggableElements | [IDraggableElementsConfig](#IDraggableElementsConfig) | [See IDraggableElementsConfig below.](#IDraggableElementsConfig) | no | Configure new draggable elements. |
 | showSectionSettingsPane  | `boolean` | `true` | no | Whether to show the section settings pane. |
-| sectionSettingsPane | [ISectionSettingsPaneConfig](#ISectionSettingsPaneConfig) | See ISectionSettingsPaneConfig below. | no | Configure the section settings pane. |
+| sectionSettingsPane | [ISectionSettingsPaneConfig](#ISectionSettingsPaneConfig) | [See ISectionSettingsPaneConfig below.](#ISectionSettingsPaneConfig) | no | Configure the section settings pane. |
 | showItemSettingsPane | `boolean` | `true` | no | Whether to show the item settings pane. |
-| itemSettingsPane | [IItemSettingsPaneConfig](#IItemSettingsPaneConfig) | See IItemSettingsPaneConfig below. | no | Configure the item settings pane. |
+| itemSettingsPane | [IItemSettingsPaneConfig](#IItemSettingsPaneConfig) | [See IItemSettingsPaneConfig below.](#IItemSettingsPaneConfig) | no | Configure the item settings pane. |
 
 
 ## <a name="IDraggableElementsConfig"></a>IDraggableElementsConfig Settings: 
