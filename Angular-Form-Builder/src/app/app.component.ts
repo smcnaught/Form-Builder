@@ -13,11 +13,14 @@ export class AppComponent implements OnInit {
   public ngOnInit(): void {
     // set form builder config in your own project if you want custom settings.
     // this.customConfig = {
-    //   draggableElements: {
-    //     textTitle: 'Banana Pancakes',
-    //   },
-    //   showItemSettingsPane: false,
-    //   showSectionSettingsPane: false
+      // draggableElements: {
+      //   textTitle: 'Set In App Component',
+      // },
+      // showSectionSettingsPane: false,
+      // showItemSettingsPane: true,
+      // itemSettingsPane: {
+      //   heading: 'Title Set in App Component'
+      // },
     // }
   }
 }

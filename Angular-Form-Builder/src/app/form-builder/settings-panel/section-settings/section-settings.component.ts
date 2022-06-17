@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 
+import { ISectionSettingsPaneConfig } from "../../shared/form-builder-config";
 import { ISectionSettings } from "../../shared/types";
 
 @Component({
@@ -9,6 +10,7 @@ import { ISectionSettings } from "../../shared/types";
 })
 export class SectionSettingsComponent {
   @Input() sectionSettings: ISectionSettings;
+  @Input() config: ISectionSettingsPaneConfig;
   @Output() updatedSection = new EventEmitter<ISectionSettings>();
 
   public updateSectionSettings(): void {

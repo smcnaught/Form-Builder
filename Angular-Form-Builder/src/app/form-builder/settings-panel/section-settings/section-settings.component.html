@@ -1,11 +1,12 @@
 <div *ngIf="sectionSettings">
-  <div>SECTION SETTINGS: </div>
+  <div>{{ config.heading }}</div>
+
   <div>
-    <span>Section Title: </span>
+    <span>{{ config.sectionTitleLabel }}</span>
     <span>
       <input
         type='text'
-        placeholder='Section Title'
+        [placeholder]='config.sectionTitlePlaceholder'
         [(ngModel)]='sectionSettings.title'
         (ngModelChange)="updateSectionSettings()" />
     </span>

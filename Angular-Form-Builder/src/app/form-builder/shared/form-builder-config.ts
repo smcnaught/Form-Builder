@@ -1,31 +1,58 @@
 export interface IFormBuilderConfig {
-  draggableElements?: IDraggableElementsConfig,
+  draggableElements?: IDraggableElementsConfig;
+
   showSectionSettingsPane?: boolean;
+  sectionSettingsPane?: ISectionSettingsPaneConfig;
+
   showItemSettingsPane?: boolean;
+  itemSettingsPane?: IItemSettingsPaneConfig;
 }
 
 export interface IDraggableElementsConfig {
-  textTitle?: string;
+  textLabel?: string;
   textIcon?: string;
   showText?: boolean;
 
-  numberTitle?: string;
+  numberLabel?: string;
   numberIcon?: string;
   showNumber?: boolean;
 
-  dateAndTimeTitle?: string;
+  dateAndTimeLabel?: string;
   dateAndTimeIcon?: string;
   showDateAndTime?: boolean;
 
-  multiSelectTitle?: string;
+  multiSelectLabel?: string;
   multiSelectIcon?: string;
   showMultiSelect?: boolean;
 
-  singleSelectTitle?: string;
+  singleSelectLabel?: string;
   singleSelectIcon?: string;
   showSingleSelect?: boolean;
 
-  mediaAndFilesTitle?: string;
+  mediaAndFilesLabel?: string;
   mediaAndFilesIcon?: string;
   showMediaAndFiles?: boolean;
+}
+
+export interface ISectionSettingsPaneConfig {
+  heading?: string;
+  sectionTitleLabel?: string;
+  sectionTitlePlaceholder?: string;
+}
+
+export interface IItemSettingsPaneConfig {
+  heading?: string;
+  itemNameLabel?: string;
+  itemNamePlaceholder?: string;
+  itemRequiredLabel?: string;
+  itemValueLabel?: string;
+  itemValuePlaceholder?: string;
+  dateLabel?: string;
+  timeLabel?: string;
+  multiSelectLabel?: string;
+  multiSelectPlaceholder?: string;
+  singleSelectLabel?: string;
+  singleSelectPlaceholder?: string;
+  fileLabel?: string;
+  chooseFileButtonText?: string;
 }

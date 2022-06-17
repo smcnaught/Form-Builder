@@ -1,19 +1,19 @@
 <div *ngIf="item && item.type !== DraggedElementType.none">
-  <div>ITEM SETTINGS: </div>
+  <div>{{ config.heading }} </div>
   
   <div>
-    <span>Item Name: </span>
+    <span>{{ config.itemNameLabel }}</span>
     <span>
       <input
         type='text'
-        placeholder='Item Name'
+        [placeholder]='config.itemNamePlaceholder'
         [(ngModel)]='item.name'
         (ngModelChange)="updateItem()" />
     </span>
   </div>
 
   <div>
-    <span>Item Required: </span>
+    <span>{{ config.itemRequiredLabel }}</span>
     <span>
       <input
         type='checkbox'
@@ -23,18 +23,18 @@
   </div>
 
   <div *ngIf="item.type === DraggedElementType.text || item.type === DraggedElementType.number">
-    <span>Item Value: </span>
+    <span>{{ config.itemValueLabel }}</span>
     <span>
       <input
         type='text'
-        placeholder='Item Value'
+        [placeholder]='config.itemValuePlaceholder'
         [(ngModel)]='item.value'
         (ngModelChange)="updateItem()" />
     </span>
   </div>
 
   <div *ngIf="item.type === DraggedElementType.dateTime">
-    <span>Date: </span>
+    <span>{{ config.dateLabel }}</span>
     <span>
       <input
         type='date'
@@ -43,7 +43,7 @@
     </span>
 
     <div>
-      <span>Time: </span>
+      <span>{{ config.timeLabel }}</span>
       <input
         type="time" 
         [(ngModel)]='$any(item.value).time'
@@ -52,7 +52,7 @@
   </div>
 
   <div *ngIf="item.type === DraggedElementType.multiSelect">
-    <span>Options: </span>
+    <span>{{ config.multiSelectLabel }}</span>
     <div *ngFor="let option of $any(item.value)">
       <span>
         <input
@@ -61,7 +61,7 @@
           (ngModelChange)="updateItem()" />
 
           <input
-            placeholder="Enter Option"
+            [placeholder]="config.multiSelectPlaceholder"
             [(ngModel)]='option.value'
             (ngModelChange)="updateItem()" />
       </span>
@@ -70,14 +70,17 @@
   </div>
 
   <div *ngIf="item.type === DraggedElementType.singleSelect">
-    <span>Options: </span>
+    <span>{{ config.singleSelectLabel }}</span>
     <div *ngFor="let option of $any(item.value); let i = index;">
       <span>
         <mat-radio-button
           [value]="option.checked"
           [checked]="option.checked"
           (change)="updateSingleSelect(i)">
-          <input [(ngModel)]="option.value" (ngModelChange)="updateItem()" />
+          <input
+            [placeholder]="config.singleSelectPlaceholder"
+            [(ngModel)]="option.value"
+            (ngModelChange)="updateItem()" />
         </mat-radio-button>
       </span>
 
@@ -85,7 +88,7 @@
   </div>
 
   <div *ngIf="item.type === DraggedElementType.multimedia">
-    <span>File: {{ $any(item).value?.name || '' }} </span>
+    <span>{{ config.fileLabel }} {{ $any(item).value?.name || '' }} </span>
     <span>
       <input
         #fileInput
@@ -93,7 +96,7 @@
         type='file'
         placeholder='Choose File'
         (change)="updateMultimedia(($any($event)).target.files[0])" />
-      <button (click)="fileInput.click()">Choose File</button>
+      <button (click)="fileInput.click()">{{ config.chooseFileButtonText }}</button>
     </span>
   </div>
 

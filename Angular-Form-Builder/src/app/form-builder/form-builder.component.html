@@ -10,7 +10,7 @@
       (dragend)="toggleDropZone(false)"
       (dragstart)="onDragNewItemStart(DraggedElementType.text)">
       <mat-icon class="icon-style">{{ config.draggableElements.textIcon }}</mat-icon>
-      <p class="text-font m-0">{{ config.draggableElements.textTitle }}</p>
+      <p class="text-font m-0">{{ config.draggableElements.textLabel }}</p>
     </div>
     <div
       *ngIf="config.draggableElements.showNumber"
@@ -21,7 +21,7 @@
       (dragend)="toggleDropZone(false)"
       (dragstart)="onDragNewItemStart(DraggedElementType.number)">
       <mat-icon class="icon-style">{{ config.draggableElements.numberIcon }}</mat-icon>
-      <p class="text-font m-0">{{ config.draggableElements.numberTitle }}</p>
+      <p class="text-font m-0">{{ config.draggableElements.numberLabel }}</p>
     </div>
     <div
       *ngIf="config.draggableElements.showDateAndTime"
@@ -32,7 +32,7 @@
       (dragend)="toggleDropZone(false)"
       (dragstart)="onDragNewItemStart(DraggedElementType.dateTime)">
       <mat-icon class="icon-style">{{ config.draggableElements.dateAndTimeIcon }}</mat-icon>
-      <p class="text-font m-0">{{ config.draggableElements.dateAndTimeTitle }}</p>
+      <p class="text-font m-0">{{ config.draggableElements.dateAndTimeLabel }}</p>
     </div>
     <div
       *ngIf="config.draggableElements.showMultiSelect"
@@ -43,7 +43,7 @@
       (dragend)="toggleDropZone(false)"
       (dragstart)="onDragNewItemStart(DraggedElementType.multiSelect)">
       <mat-icon class="icon-style">{{ config.draggableElements.multiSelectIcon }}</mat-icon>
-      <p class="text-font m-0">{{ config.draggableElements.multiSelectTitle }}</p>
+      <p class="text-font m-0">{{ config.draggableElements.multiSelectLabel }}</p>
     </div>
     <div
       *ngIf="config.draggableElements.showSingleSelect"
@@ -54,7 +54,7 @@
       (dragend)="toggleDropZone(false)"
       (dragstart)="onDragNewItemStart(DraggedElementType.singleSelect)">
       <mat-icon class="icon-style">{{ config.draggableElements.singleSelectIcon }}</mat-icon>
-      <p class="text-font m-0">{{ config.draggableElements.singleSelectTitle }}</p>
+      <p class="text-font m-0">{{ config.draggableElements.singleSelectLabel }}</p>
     </div>
     <div
       *ngIf="config.draggableElements.showMediaAndFiles"
@@ -65,7 +65,7 @@
       (dragend)="toggleDropZone(false)"
       (dragstart)="onDragNewItemStart(DraggedElementType.multimedia)">
       <mat-icon class="icon-style">{{ config.draggableElements.mediaAndFilesIcon }}</mat-icon>
-      <p class="text-font m-0">{{ config.draggableElements.mediaAndFilesTitle }}</p>
+      <p class="text-font m-0">{{ config.draggableElements.mediaAndFilesLabel }}</p>
     </div>
   </div>
 
@@ -114,6 +114,7 @@
     *ngIf="config.showItemSettingsPane"
     class="panel-widths"
     [item]="selectedItem"
+    [config]="config.itemSettingsPane"
     (updatedItem)="onUpdateSelectedItem($event)">
   </item-settings>
 
@@ -121,6 +122,7 @@
     *ngIf="config.showSectionSettingsPane"
     class="panel-widths"
     [sectionSettings]="selectedSectionSettings"
+    [config]="config.sectionSettingsPane"
     (updatedSection)="onUpdateSelectedSection($event)">
   </section-settings>
 </div>
